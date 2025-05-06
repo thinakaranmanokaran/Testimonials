@@ -6,3 +6,5 @@ export { default as UserFooter } from './user/Footer';
 
 export { default as AdminHeader } from './admin/Header';
 export { default as AdminFooter } from './admin/Footer';
+
+export { default as HorizontalReviewCard } from "./global/HorizontalReviewCard";

@@ -1,5 +1,49 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Logo";
+  src: url(./assets/fonts/logo/CODEBold.otf)  format("opentype");
+}
+
+@font-face {
+  font-family: "Title";
+  src: url(./assets/fonts/title/tanker/Tanker-Regular.otf)  format("opentype");
+}
+
+@font-face {
+  font-family: "TitleInter";
+  src: url(./assets/fonts/paragrabh/inter/Inter_18pt-SemiBold.ttf)  format("truetype");
+}
+
+@font-face {
+  font-family: "ParaInter";
+  src: url(./assets/fonts/paragrabh/inter/Inter_18pt-Regular.ttf)  format("truetype");
+}
+
+@font-face {
+  font-family: "ParaUrban";
+  src: url(./assets/fonts/paragrabh/urban/Urbanist-Regular.ttf)  format("truetype");
+}
+
+@font-face {
+  font-family: "Code";
+  src: url(./assets/fonts/semi/code/fonnts.com-Adelle_Mono_W03_Regular.ttf)  format("truetype");
+}
+
 @theme {
   --color-textdark: #000015;
+  /* --color-textgrey: #3a3a3a; */
+  --color-textgrey: #686D76;
+  --color-bgpink: #ffc2be;
+  --color-bgyellow: #fff469;
+
+  --color-bgdark: #121514;
+  --color-bggrey: #f8f6f5;
+
+  --font-logo: "Logo", sans-serif;
+  --font-title: "Title", sans-serif;
+  --font-title_inter: "TitleInter", sans-serif;
+  --font-para_inter: "ParaInter", sans-serif;
+  --font-para_urban: "ParaUrban", sans-serif;
+  --font-code: "Code", sans-serif;
 }
