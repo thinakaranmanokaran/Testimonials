@@ -8,3 +8,4 @@ export { default as AdminHeader } from './admin/Header';
 export { default as AdminFooter } from './admin/Footer';
 
 export { default as HorizontalReviewCard } from "./global/HorizontalReviewCard";
+export { default as Stats } from "./global/Stats"
