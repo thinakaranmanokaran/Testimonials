@@ -47,3 +47,19 @@
   --font-para_urban: "ParaUrban", sans-serif;
   --font-code: "Code", sans-serif;
 }
+
+.box_top {
+  --mask:
+    radial-gradient(57.88px at 50% 79.5px,#000 99%,#0000 101%) calc(50% - 60px) 0/120px 100%,
+    radial-gradient(57.88px at 50% -49.5px,#0000 99%,#000 101%) 50% 30px/120px 100% repeat-x;
+  -webkit-mask: var(--mask);
+          mask: var(--mask);
+}
+
+.box_bottom {
+  --mask:
+    radial-gradient(57.88px at 50% calc(100% - 79.5px),#000 99%,#0000 101%) calc(50% - 60px) 0/120px 100%,
+    radial-gradient(57.88px at 50% calc(100% + 49.5px),#0000 99%,#000 101%) 50% calc(100% - 30px)/120px 100% repeat-x;
+  -webkit-mask: var(--mask);
+          mask: var(--mask);
+}
