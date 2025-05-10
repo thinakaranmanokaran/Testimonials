@@ -9,7 +9,7 @@ const Navigation = [
     },
     {
         title: "Services",
-        link: "/service"
+        link: "/services"
     },
     {
         title: "Register",

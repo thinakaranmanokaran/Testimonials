@@ -1,6 +1,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
-import { About, Home, Register, Services, Signin } from '../../pages'
+import { About, Contact, Home, Register, Services, Signin } from '../../pages'
 import { PublicLayout } from '../../layouts'
 
 const PublicRoutes = () => {
@@ -9,7 +9,8 @@ const PublicRoutes = () => {
             <Route index element={<Home />} />
             <Route path="/" element={<PublicLayout />}>
                 <Route path="about" element={<About />} />
-                <Route path="about" element={<Services />} />
+                <Route path="services" element={<Services />} />
+                <Route path="contact" element={<Contact />} />
                 {/* <Route path="*" element={<NotFound />} /> */}
             </Route>
             <Route path="/signin" element={<Signin />} />

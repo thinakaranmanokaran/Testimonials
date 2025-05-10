@@ -1,10 +1,11 @@
 import React from 'react'
-import { PublicRoutes } from './routes'
+import { DocsRoutes, PublicRoutes } from './routes'
 
 const Router = () => {
     return (
         <div>
             <PublicRoutes />
+            <DocsRoutes />
         </div>
     )
 }

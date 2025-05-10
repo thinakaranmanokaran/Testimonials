@@ -1,6 +1,10 @@
 export { default as  Home } from './public/Home';
 export { default as  About } from './public/About';
 export { default as  Services } from './public/Services';
+export { default as Contact } from "./public/Contact";
+
+export { default as GettingStarted } from "./public/docs/GettingStarted";
+
 export { default as  Register } from './public/Register';
 export { default as  Signin } from './public/Signin';
 
