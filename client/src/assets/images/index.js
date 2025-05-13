@@ -13,8 +13,13 @@ import Form3 from "./public/home/Share.png"
 import Form4 from "./public/home/Authentication1.png"
 import Form5 from "./public/home/Comment1.png"
 
+import Register from "./public/register/register.webp"
+
 export default {
     Logo, HeroUser, CatGIF, Pattern, Star, Client, Creator, 
     Form1, Form2, Form3, Form4, Form5, 
 
+    Register,
 }
+
+//https://www.lummi.ai/illustration/colorful-bicycle-uqzsl
