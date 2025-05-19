@@ -4,7 +4,7 @@ import images from '../../../assets/images';
 
 const Header = () => {
     return (
-        <div className=' bg-[#ffffff10] backdrop-blur-lg w-full fixed top-0 z-20 h-12 flex items-center px-4 ' >
+        <div className='  backdrop-blur-lg w-full fixed top-0 z-20 h-12 flex items-center px-4 ' >
             <div className='flex items-center h-full w-full  justify-between' >
                 <div>
                     <Link to="/" >
