@@ -10,7 +10,7 @@ const Docs = () => {
                 <div className="fixed left-0 h-full ">
                     <DocsNavigation />
                 </div>
-                    <div className='w-3/5 relative left-67.5 bg-bggrey py-12 px-16' >
+                    <div className='w-3/5 relative left-67.5 bg-bggrey py-28 px-12' >
                         <Outlet />
                     </div>
                 <div className='fixed right-0  h-full' >

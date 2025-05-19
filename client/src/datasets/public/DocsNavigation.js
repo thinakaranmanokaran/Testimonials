@@ -1,8 +1,4 @@
-import { GoRocket } from "react-icons/go";
-import { MdOutlineDashboardCustomize } from "react-icons/md";
-import { FaWpforms, FaBookOpen } from "react-icons/fa";
-import { AiOutlineApi } from "react-icons/ai";
-import { VscFeedback } from "react-icons/vsc";
+import { GoFlame, GoHome, GoProject, GoRocket, GoThumbsup, GoWorkflow, GoZap } from "react-icons/go";
 
 const DocsNavigation = [
     {
@@ -42,7 +38,7 @@ const DocsNavigation = [
     },
     {
         head: "Dashboard",
-        headicon: MdOutlineDashboardCustomize,
+        headicon: GoFlame,
         headlink: "dashboard",
         titleData: [
             {
@@ -63,7 +59,7 @@ const DocsNavigation = [
     },
     {
         head: "Forms",
-        headicon: FaWpforms,
+        headicon: GoWorkflow,
         headlink: "forms",
         titleData: [
             {
@@ -84,7 +80,7 @@ const DocsNavigation = [
     },
     {
         head: "Docs",
-        headicon: FaBookOpen,
+        headicon: GoProject,
         headlink: "docs",
         titleData: [
             {
@@ -105,7 +101,7 @@ const DocsNavigation = [
     },
     {
         head: "Testimonials",
-        headicon: VscFeedback,
+        headicon: GoThumbsup,
         headlink: "testimonials",
         titleData: [
             {
@@ -126,7 +122,7 @@ const DocsNavigation = [
     },
     {
         head: "API",
-        headicon: AiOutlineApi,
+        headicon: GoZap,
         headlink: "api",
         titleData: [
             {
