@@ -21,8 +21,8 @@ const DocsNavigation = [
                 ],
             },
             {
-                title: "Registration",
-                titlelink: "register",
+                title: "Authentication",
+                titlelink: "authentication",
                 subtitleData: [
                     {
                         subtitle: "How to Register",
@@ -39,11 +39,11 @@ const DocsNavigation = [
     {
         head: "Dashboard",
         headicon: GoFlame,
-        headlink: "dashboard",
+        headlink: "/user/dashboard",
         titleData: [
             {
                 title: "Manage Forms",
-                titlelink: "manage-forms",
+                titlelink: "forms",
                 subtitleData: [
                     {
                         subtitle: "Create Feedback Form",
@@ -53,19 +53,6 @@ const DocsNavigation = [
                         subtitle: "Form Settings",
                         subtitlelink: "form-settings",
                     },
-                ],
-            },
-        ],
-    },
-    {
-        head: "Forms",
-        headicon: GoWorkflow,
-        headlink: "forms",
-        titleData: [
-            {
-                title: "Form Flow",
-                titlelink: "form-flow",
-                subtitleData: [
                     {
                         subtitle: "Share Form",
                         subtitlelink: "share-form",
@@ -81,53 +68,28 @@ const DocsNavigation = [
     {
         head: "Docs",
         headicon: GoProject,
-        headlink: "docs",
-        titleData: [
-            {
-                title: "API Reference",
-                titlelink: "api-reference",
-                subtitleData: [
-                    {
-                        subtitle: "Authentication",
-                        subtitlelink: "authentication",
-                    },
-                    {
-                        subtitle: "Endpoints",
-                        subtitlelink: "endpoints",
-                    },
-                ],
-            },
-        ],
+        headlink: "overview",
     },
     {
         head: "Testimonials",
         headicon: GoThumbsup,
         headlink: "testimonials",
-        titleData: [
-            {
-                title: "Feedback Showcase",
-                titlelink: "feedback-showcase",
-                subtitleData: [
-                    {
-                        subtitle: "View Feedback",
-                        subtitlelink: "view-feedback",
-                    },
-                    {
-                        subtitle: "Embed in Portfolio",
-                        subtitlelink: "embed-portfolio",
-                    },
-                ],
-            },
-        ],
     },
+
+    {
+        head: "Forms",
+        headicon: GoWorkflow,
+        headlink: "forms",
+    },
+
     {
         head: "API",
         headicon: GoZap,
         headlink: "api",
         titleData: [
             {
-                title: "Usage Guide",
-                titlelink: "usage-guide",
+                title: "Manage Testimonials",
+                titlelink: "testimonials",
                 subtitleData: [
                     {
                         subtitle: "Token Setup",
@@ -136,6 +98,22 @@ const DocsNavigation = [
                     {
                         subtitle: "Fetch Testimonials",
                         subtitlelink: "fetch-testimonials",
+                    },
+                    {
+                        subtitle: "View Feedback",
+                        subtitlelink: "view-feedback",
+                    },
+                    {
+                        subtitle: "Embed in Portfolio",
+                        subtitlelink: "embed-portfolio",
+                    },
+                    {
+                        subtitle: "Authentication",
+                        subtitlelink: "authentication",
+                    },
+                    {
+                        subtitle: "Endpoints",
+                        subtitlelink: "endpoints",
                     },
                 ],
             },

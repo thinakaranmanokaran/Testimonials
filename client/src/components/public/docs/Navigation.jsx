@@ -12,7 +12,7 @@ const Navigation = () => {
                         <div key={index} >
                             {
                                 Data.head &&
-                                <Link className='flex items-center space-x-2 mt-2  text-[16px] ' >
+                                <Link className='flex items-center space-x-2 mt-2  text-[16px] ' to={Data.headlink} >
                                     <div><Data.headicon size={20} /></div>
                                     <div>{Data.head}</div>
                                 </Link>
@@ -26,10 +26,10 @@ const Navigation = () => {
                     DocsNavigation.map((Data, index) => (
                         Data.titleData && Data.titleData.map((NavData, NavIndex) => (
                             <div className=' flex flex-col mt-4  ' >
-                                <Link className='mb-1' >{NavData.title}</Link>
+                                <Link className='mb-1' to={NavData.titlelink} >{NavData.title}</Link> 
                                 {
                                     NavData.subtitleData && NavData.subtitleData.map((SubData, SubIndex) => (
-                                        <Link className='pl-4 ml-2 text-textgrey border-l-[1px] py-1 border-[#00000040] flex items-center space-x-1 group' >
+                                        <Link className='pl-4 ml-2 text-textgrey border-l-[1px] py-1 border-[#00000040] flex items-center space-x-1 group' to={`${NavData.titlelink}#${SubData.subtitlelink}`} >
                                             <span className='bg-bggrey relative z-10' >{SubData.subtitle}</span>
                                             <GoArrowRight className=' size-4 -translate-x-6 w-fit group-hover:translate-x-0 transition-transform duration-300' />
                                         </Link>
