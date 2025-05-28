@@ -13,8 +13,8 @@ const InputBox = ({ type="text", label="name" }) => {
             />
             <label
                 className={`absolute left-3 transition-all duration-300 bg-white px-1 text-bgdark pointer-events-none 
-          ${value ? '-top-1 text-xs' : 'top-1/2 -translate-y-1/2 text-base'} 
-          peer-focus:-top-1 peer-focus:text-xs peer-focus:-translate-y-0`}
+          ${value ? '-top-1.5 text-sm' : 'top-1/2 -translate-y-1/2 text-base'} 
+          peer-focus:-top-1.5 peer-focus:text-sm peer-focus:-translate-y-0`}
             >
                 {label}
             </label>
