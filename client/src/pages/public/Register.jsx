@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import images from '../../assets/images'
 import { Button, InputBox } from '../../components';
+import { GoArrowLeft } from "react-icons/go";
 
 const Register = () => {
 
     const [verify, setVerify] = useState(false);
     const [gotoRegister, setGoToRegister] = useState(false);
+    const [gotoSignin, setGoToSignin] = useState(false);
 
     const handleVerify = () => {
         setVerify(true);
@@ -13,9 +15,21 @@ const Register = () => {
 
     const handleOpenRegister = () => {
         setVerify(false);
+        setGoToSignin(false);
         setGoToRegister(true);
     };
 
+    const handleOpenSignin = () => {
+        setVerify(false);
+        setGoToRegister(false);
+        setGoToSignin(true);
+    };
+
+    const handleOpenInitial = () => {
+        setVerify(false);
+        setGoToRegister(false);
+        setGoToSignin(false);
+    };
 
     const RegisterForm = () => {
         return (
@@ -23,9 +37,12 @@ const Register = () => {
                 <div className='w-full grid grid-cols-2 gap-4 ' >
                     <InputBox type='text' label='Name' />
                     <InputBox type='email' label='Email' />
-                    <InputBox type='password' label='Password' />
+                    <InputBox type='password' showPassword='yes' label='Password' />
                     <InputBox type="number" label='Mobile No.' />
                     <Button className="col-span-2" />
+                </div>
+                <div className='space-x-1 text-[15px] flex justify-center mt-4'   >
+                    <span className='text-textgrey opacity-75' >Already have an Account?</span><span className='underline cursor-pointer' onClick={handleOpenSignin}>SignIn</span>
                 </div>
             </div>
         )
@@ -38,7 +55,20 @@ const Register = () => {
                 <Button />
                 <h4 className='text-base text-center mb-5 tracking-tight ' >To verify that your account is exist.</h4>
                 <div className='space-x-1 text-[15px] flex justify-center -mt-2'   >
-                    <span className='text-textgrey opacity-75' >If you're sure, you don't have an Account?</span><span className='underline cursor-pointer' onClick={handleOpenRegister}>Sign Up</span>
+                    <span className='text-textgrey opacity-75' >If you're sure, you don't have an Account?</span><span className='underline cursor-pointer' onClick={handleOpenRegister}>Register</span>
+                </div>
+            </div>
+        )
+    }
+
+    const SignInForm = () => {
+        return (
+            <div className=' space-y-4 w-3/4' >
+                <InputBox type='text' label='Username' />
+                <InputBox type='password' showPassword='yes' label='Password' />
+                <Button />
+                <div className='space-x-1 text-[15px] flex justify-center mt-3'   >
+                    <span className='text-textgrey opacity-75' >If you're sure, you don't have an Account?</span><span className='underline cursor-pointer' onClick={handleOpenRegister}>Register</span>
                 </div>
             </div>
         )
@@ -65,7 +95,7 @@ const Register = () => {
                         <span>Create a Account in <span className='font-semibold' >Rumoro</span> </span>
                     </button>
                     <div className='space-x-1 text-sm' >
-                        <span className='text-textgrey opacity-75' >Already have an Account?</span><span className='underline' >SignIn</span>
+                        <span className='text-textgrey opacity-75' >Already have an Account?</span><span className='underline cursor-pointer' onClick={handleOpenSignin}>SignIn</span>
                     </div>
                 </div>
             </div>
@@ -73,17 +103,23 @@ const Register = () => {
     }
 
     const renderContent = () => {
-        if (!gotoRegister && !verify) return <InitialOptions />;
-        if (verify && !gotoRegister) return <VerificationForm />;
-        if (gotoRegister && !verify) return <RegisterForm />;
+        if (!gotoRegister && !verify && !gotoSignin) return <InitialOptions />;
+        if (verify && !gotoRegister && !gotoSignin) return <VerificationForm />;
+        if (gotoRegister && !verify && !gotoSignin) return <RegisterForm />;
+        if (!gotoRegister && !verify && gotoSignin) return <SignInForm />;
         return null;
     };
+
 
 
     return (
         <div className='bg-bggrey h-full w-full min-h-screen' >
             <div className='flex justify-center items-center h-screen w-full  ' >
-                <div className='bg-white h-full w-full max-w-3/4 max-h-3/4 overflow-auto shadow-md flex rounded-4xl ' >
+                <div className='bg-white h-full w-full max-w-3/4 max-h-3/4 overflow-auto shadow-md flex rounded-4xl relative' >
+                    {
+                        (gotoRegister || verify || gotoSignin) && (
+                            <button className='absolute top-3 left-3 bg-[#00000010] p-2 hover:rotate-45 transition-transform duration-300 cursor-pointer rounded-full text-2xl ' onClick={handleOpenInitial} ><GoArrowLeft className='' /></button>)
+                    }
                     <div className='w-3/5 p-4  ' >
                         <div className='w-full flex   items-center h-full flex-col font-para_inter ' >
                             <div className=' h-40 flex items-center' >
