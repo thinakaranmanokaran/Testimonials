@@ -2,13 +2,15 @@ import React, { useState } from 'react'
 import images from '../../assets/images'
 import { Button, InputBox } from '../../components';
 import { GoArrowLeft } from "react-icons/go";
+import axios from 'axios';
 
 const Register = () => {
 
     const [verify, setVerify] = useState(false);
     const [gotoRegister, setGoToRegister] = useState(false);
     const [gotoSignin, setGoToSignin] = useState(false);
-
+    const API_URL = import.meta.env.VITE_URL;
+    // alert(API_URL);
     const handleVerify = () => {
         setVerify(true);
     }
@@ -31,6 +33,8 @@ const Register = () => {
         setGoToSignin(false);
     };
 
+
+
     const RegisterForm = () => {
         return (
             <div className='w-full' >
@@ -48,18 +52,90 @@ const Register = () => {
         )
     }
 
-    const VerificationForm = () => {
+    const VerificationForm = ({ handleOpenRegister }) => {
+        const [identifier, setIdentifier] = useState('');
+        const [result, setResult] = useState(null);
+        const [loading, setLoading] = useState(false);
+        const [errorMsg, setErrorMsg] = useState('');
+        const [value, setValue] = useState('');
+
+        const handleCheck = async () => {
+            if (!identifier.trim()) {
+                setErrorMsg('Please enter a valid username or email.');
+                setResult(null);
+                return;
+            }
+
+            setLoading(true);
+            setErrorMsg('');
+            setResult(null);
+
+            try {
+                const res = await axios.post(`${API_URL}/api/public/identifier`, {
+                    identifier
+                });
+
+                if (res.data.exists) {
+                    setResult({ found: true, user: res.data.user });
+                } else {
+                    setResult({ found: false });
+                }
+            } catch (error) {
+                console.error('Error identifying user:', error);
+                setErrorMsg(error.response?.data?.message || 'Server error');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         return (
-            <div className=' space-y-4 w-3/4' >
-                <InputBox type='text' label='Username' />
-                <Button />
-                <h4 className='text-base text-center mb-5 tracking-tight ' >To verify that your account is exist.</h4>
-                <div className='space-x-1 text-[15px] flex justify-center -mt-2'   >
-                    <span className='text-textgrey opacity-75' >If you're sure, you don't have an Account?</span><span className='underline cursor-pointer' onClick={handleOpenRegister}>Register</span>
+            <div className="space-y-4 w-3/4">
+                <InputBox
+                    type="text"
+                    label="Username or Email"
+                    value={value}
+                    setValue={(val) => {
+                        setValue(val);
+                        setIdentifier(val); // keep both updated
+                    }}
+                />
+
+
+                <Button onClick={handleCheck} disabled={loading} className="w-full">
+                    {loading ? 'Checking...' : 'Check Account'}
+                </Button>
+
+                {errorMsg && (
+                    <p className="text-red-500 text-sm text-center">{errorMsg}</p>
+                )}
+
+                {result && result.found && (
+                    <p className="text-green-600 text-sm text-center">
+                        ✅ User found: {result.user.name} ({result.user.email})
+                    </p>
+                )}
+
+                {result && !result.found && (
+                    <p className="text-yellow-600 text-sm text-center">
+                        ❌ No user found with that username or email.
+                    </p>
+                )}
+
+                <h4 className="text-base text-center mb-5 tracking-tight">
+                    To verify that your account exists.
+                </h4>
+
+                <div className="space-x-1 text-[15px] flex justify-center -mt-2">
+                    <span className="text-textgrey opacity-75">
+                        If you're sure you don't have an account?
+                    </span>
+                    <span className="underline cursor-pointer" onClick={handleOpenRegister}>
+                        Register
+                    </span>
                 </div>
             </div>
-        )
-    }
+        );
+    };
 
     const SignInForm = () => {
         return (

@@ -1,7 +1,7 @@
 exports.registerRequest = (req, res, next) => {
-    const { name, email, phoneNo, password } = req.body;
+    const { name, email, phoneNo, password, username } = req.body;
 
-    if (!name || !email || !phoneNo || !password ) {
+    if (!name || !email || !phoneNo || !password || !username ) {
         return res.status(400).json({ message: 'All required fields must be filled' });
     }
 
@@ -9,9 +9,9 @@ exports.registerRequest = (req, res, next) => {
 };
 
 exports.signinRequest = (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password ||!username) {
         return res.status(400).json({ message: 'All required fields must be filled' });
     }
 

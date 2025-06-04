@@ -9,10 +9,7 @@ exports.registerUser = async (req, res) => {
       name,
       email,
       phoneNo,
-      collegeName,
-      collegeAddress,
-      degree,
-      department,
+      username,
       password,
     } = req.body;
 
@@ -29,18 +26,15 @@ exports.registerUser = async (req, res) => {
     // Assign role based on email match
     const adminEmail = process.env.ADMIN_MAIL;
     const employeeEmail = process.env.EMP_MAIL;
-    const role = email === adminEmail ? 'admin' : email === employeeEmail ? 'employee' : 'student';
+    const role = email === adminEmail ? 'admin' : email === employeeEmail ? 'employee' : 'user';
 
     // Create the user
     const user = await Register.create({
       name,
       email,
       phoneNo,
-      collegeName,
-      collegeAddress,
-      degree,
-      department,
-      password,
+      username,
+      password: hashedPassword,
       role,
     });
 
@@ -142,3 +136,31 @@ exports.getUserNameByEmail = async (req, res) => {
 };
 
 
+exports.checkUserExistence = async (req, res) => {
+  try {
+    const { identifier } = req.body; // identifier can be email or username
+
+    // Find by email OR username
+    const user = await Register.findOne({
+      $or: [{ email: identifier }, { username: identifier }]
+    });
+
+    if (user) {
+      return res.status(200).json({
+        exists: true,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        }
+      });
+    } else {
+      return res.status(404).json({ exists: false, message: "User not found" });
+    }
+  } catch (error) {
+    console.error('Error in checkUserExistence:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

@@ -5,16 +5,14 @@ const bcrypt = require("bcryptjs");
 const Register = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true },
     phoneNo: { type: String, required: true },
-    collegeName: { type: String, required: true },
-    collegeAddress: { type: String, required: true },
-    degree: { type: String, required: true },
-    department: { type: String, required: true },
     password: { type: String, required: true, select: false },
     role: {
         type: String,
-        enum: ["admin", "employee", "student"],
-        default: "student",
+        enum: ["admin", "employee", "user"],
+        default: "user",
+        required: false,
     },
 }, { timestamps: true });
 
@@ -22,11 +20,18 @@ const Register = new mongoose.Schema({
 const signinSchema = new mongoose.Schema({
     email: {
         type: String,
-        required: [true, "Email is required"],
         unique: true,
         match: [
             /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
             "Please provide a valid email",
+        ],
+    },
+    username: {
+        type: String,
+        unique: true,
+        match: [
+            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+            "Please provide a valid username",
         ],
     },
     password: {
