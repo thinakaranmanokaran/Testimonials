@@ -6,7 +6,7 @@ const Register = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     username: { type: String, required: true, unique: true },
-    phoneNo: { type: String, required: true },
+    phoneNo: { type: String, required: false },
     password: { type: String, required: true, select: false },
     role: {
         type: String,

@@ -3,12 +3,16 @@ import images from '../../assets/images'
 import { Button, InputBox } from '../../components';
 import { GoArrowLeft } from "react-icons/go";
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const Register = () => {
 
     const [verify, setVerify] = useState(false);
     const [gotoRegister, setGoToRegister] = useState(false);
     const [gotoSignin, setGoToSignin] = useState(false);
+    const [verifiedUsername, setVerifiedUsername] = useState('');
+    const [identifier, setIdentifier] = useState('');
+
     const API_URL = import.meta.env.VITE_URL;
     // alert(API_URL);
     const handleVerify = () => {
@@ -36,23 +40,78 @@ const Register = () => {
 
 
     const RegisterForm = () => {
+        const [name, setName] = useState('');
+        const [email, setEmail] = useState(identifier); // from parent state
+        const [username, setUsername] = useState('');
+        const [password, setPassword] = useState('');
+        const [loading, setLoading] = useState(false);
+        const [errorMsg, setErrorMsg] = useState('');
+
+        const handleRegister = async () => {
+            if (!name || !email || !username || !password) {
+                setErrorMsg("Please fill all the fields.");
+                return;
+            }
+
+            setLoading(true);
+            setErrorMsg('');
+
+            try {
+                const res = await axios.post(`${API_URL}/api/public/register`, {
+                    name,
+                    email,
+                    username,
+                    password,
+                });
+
+                const token = res.data.token;
+                localStorage.setItem('token', token);
+
+                const decoded = jwtDecode(token);
+                console.log("Decoded user:", decoded);
+
+                // You can navigate or show success here
+                alert('Registered successfully!');
+                // handleOpenInitial(); // Optional: Go back to initial screen
+                setName('');
+                setEmail('');
+                setUsername('');
+                setPassword('');
+            } catch (err) {
+                console.error('Registration failed:', err);
+                alert('Registration failed:', err);
+                setErrorMsg(err.response?.data?.message || 'Registration failed');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         return (
-            <div className='w-full' >
-                <div className='w-full grid grid-cols-2 gap-4 ' >
-                    <InputBox type='text' label='Name' />
-                    <InputBox type='email' label='Email' />
-                    <InputBox type='password' showPassword='yes' label='Password' />
-                    <InputBox type="number" label='Mobile No.' />
-                    <Button className="col-span-2" />
+            <div className='w-full'>
+                <div className='w-full grid grid-cols-2 gap-4'>
+                    <InputBox type='text' label='Name' value={name} setValue={setName} />
+                    <InputBox type='email' label='Email' value={email} setValue={setEmail} />
+                    <InputBox type='text' label='Username' value={username} setValue={setUsername} />
+                    <InputBox type='password' showPassword='yes' label='Password' value={password} setValue={setPassword} />
+                    <Button className="col-span-2" onClick={handleRegister} disabled={loading}>
+                        {loading ? 'Registering...' : 'Register'}
+                    </Button>
                 </div>
-                <div className='space-x-1 text-[15px] flex justify-center mt-4'   >
-                    <span className='text-textgrey opacity-75' >Already have an Account?</span><span className='underline cursor-pointer' onClick={handleOpenSignin}>SignIn</span>
+
+                {errorMsg && (
+                    <p className="text-red-500 text-sm mt-2 text-center col-span-2">{errorMsg}</p>
+                )}
+
+                <div className='space-x-1 text-[15px] flex justify-center mt-4'>
+                    <span className='text-textgrey opacity-75'>Already have an Account?</span>
+                    <span className='underline cursor-pointer' onClick={handleOpenSignin}>SignIn</span>
                 </div>
             </div>
-        )
-    }
+        );
+    };
 
-    const VerificationForm = ({ handleOpenRegister }) => {
+
+    const VerificationForm = () => {
         const [identifier, setIdentifier] = useState('');
         const [result, setResult] = useState(null);
         const [loading, setLoading] = useState(false);
@@ -77,8 +136,12 @@ const Register = () => {
 
                 if (res.data.exists) {
                     setResult({ found: true, user: res.data.user });
+                    setVerifiedUsername(res.data.user.username || identifier); // set verified username
+                    handleOpenSignin(); // 👉 go to SignIn form
                 } else {
                     setResult({ found: false });
+                    setIdentifier(identifier); // pass value to register form
+                    setGoToRegister(true); // 👉 go to Register form
                 }
             } catch (error) {
                 console.error('Error identifying user:', error);
@@ -96,10 +159,9 @@ const Register = () => {
                     value={value}
                     setValue={(val) => {
                         setValue(val);
-                        setIdentifier(val); // keep both updated
+                        setIdentifier(val);
                     }}
                 />
-
 
                 <Button onClick={handleCheck} disabled={loading} className="w-full">
                     {loading ? 'Checking...' : 'Check Account'}
@@ -107,18 +169,6 @@ const Register = () => {
 
                 {errorMsg && (
                     <p className="text-red-500 text-sm text-center">{errorMsg}</p>
-                )}
-
-                {result && result.found && (
-                    <p className="text-green-600 text-sm text-center">
-                        ✅ User found: {result.user.name} ({result.user.email})
-                    </p>
-                )}
-
-                {result && !result.found && (
-                    <p className="text-yellow-600 text-sm text-center">
-                        ❌ No user found with that username or email.
-                    </p>
                 )}
 
                 <h4 className="text-base text-center mb-5 tracking-tight">
@@ -133,22 +183,26 @@ const Register = () => {
                         Register
                     </span>
                 </div>
+
             </div>
         );
     };
 
+
     const SignInForm = () => {
         return (
             <div className=' space-y-4 w-3/4' >
-                <InputBox type='text' label='Username' />
+                <InputBox type='text' label='Username' value={verifiedUsername} setValue={() => { }} />
                 <InputBox type='password' showPassword='yes' label='Password' />
                 <Button />
-                <div className='space-x-1 text-[15px] flex justify-center mt-3'   >
-                    <span className='text-textgrey opacity-75' >If you're sure, you don't have an Account?</span><span className='underline cursor-pointer' onClick={handleOpenRegister}>Register</span>
+                <div className='space-x-1 text-[15px] flex justify-center mt-3' >
+                    <span className='text-textgrey opacity-75'>If you're sure, you don't have an Account?</span>
+                    <span className='underline cursor-pointer' onClick={handleOpenRegister}>Register</span>
                 </div>
             </div>
         )
     }
+
 
     const InitialOptions = () => {
         return (
