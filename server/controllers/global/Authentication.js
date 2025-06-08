@@ -34,7 +34,7 @@ exports.registerUser = async (req, res) => {
       email,
       phoneNo,
       username,
-      password: hashedPassword,
+      password,
       role,
     });
 
@@ -92,29 +92,32 @@ exports.updateUserProfile = async (req, res) => {
 // Check if user exists (Login)
 exports.signinUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    // Query the 'users' collection
-    const user = await Register.findOne({ email }).select('+password');
+    // Try finding user by username or email
+    const user = await Register.findOne({
+      $or: [{ username }, { email: username }],
+    }).select('+password');
+
     if (!user) {
-      return res.status(404).json({ message: 'User email not found' });
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // Compare the provided password with the stored hashed password
+    console.log('Incoming password:', password);
+    console.log('Stored hashed password:', user.password);
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      console.log('Comming Pass :', password);
-      console.log('Stored Pass :', user.password);
       return res.status(401).json({ message: 'Invalid password' });
     }
 
-    // return res.status(200).json({ message: 'Success', user });
     sendToken(user, 200, res);
   } catch (error) {
-    console.error('Error in addUser:', error);
+    console.error('Error in signinUser:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 exports.getUserNameByEmail = async (req, res) => {
   try {

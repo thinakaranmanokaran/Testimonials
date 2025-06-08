@@ -190,18 +190,75 @@ const Register = () => {
 
 
     const SignInForm = () => {
+        const [username, setUsername] = useState(verifiedUsername || '');
+        const [password, setPassword] = useState('');
+        const [loading, setLoading] = useState(false);
+        const [errorMsg, setErrorMsg] = useState('');
+    
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username);
+    
+        const handleSignIn = async () => {
+            if (!username || !password) {
+                setErrorMsg('Please enter both email and password.');
+                return;
+            }
+    
+            // if (!isEmail) {
+            //     setErrorMsg('Please enter a valid email.');
+            //     return;
+            // }
+    
+            setLoading(true);
+            setErrorMsg('');
+    
+            try {
+                const res = await axios.post(`${API_URL}/api/public/signin`, {
+                    username,
+                    password,
+                });
+    
+                alert('Login successful:', res.data);
+                // Store token / redirect here
+    
+            } catch (error) {
+                console.error('Login failed:', error);
+                setErrorMsg(error.response?.data?.message || 'Invalid credentials');
+            } finally {
+                setLoading(false);
+            }
+        };
+    
         return (
-            <div className=' space-y-4 w-3/4' >
-                <InputBox type='text' label='Username' value={verifiedUsername} setValue={() => { }} />
-                <InputBox type='password' showPassword='yes' label='Password' />
-                <Button />
-                <div className='space-x-1 text-[15px] flex justify-center mt-3' >
+            <div className='space-y-4 w-3/4'>
+                <InputBox
+                    type='text'
+                    label='Email'
+                    value={username}
+                    setValue={setUsername}
+                />
+                <InputBox
+                    type='password'
+                    showPassword='yes'
+                    label='Password'
+                    value={password}
+                    setValue={setPassword}
+                />
+                <Button onClick={handleSignIn} disabled={loading} className='w-full'>
+                    {loading ? 'Signing in...' : 'Sign In'}
+                </Button>
+    
+                {errorMsg && (
+                    <p className='text-red-500 text-sm text-center'>{errorMsg}</p>
+                )}
+    
+                <div className='space-x-1 text-[15px] flex justify-center mt-3'>
                     <span className='text-textgrey opacity-75'>If you're sure, you don't have an Account?</span>
                     <span className='underline cursor-pointer' onClick={handleOpenRegister}>Register</span>
                 </div>
             </div>
-        )
-    }
+        );
+    };
+    
 
 
     const InitialOptions = () => {

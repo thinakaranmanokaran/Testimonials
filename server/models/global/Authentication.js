@@ -18,21 +18,21 @@ const Register = new mongoose.Schema({
 
 // Define the existing user schema
 const signinSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        unique: true,
-        match: [
-            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-            "Please provide a valid email",
-        ],
-    },
+    // email: {
+    //     type: String,
+    //     unique: true,
+    //     match: [
+    //         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+    //         "Please provide a valid email",
+    //     ],
+    // },
     username: {
         type: String,
         unique: true,
-        match: [
-            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-            "Please provide a valid username",
-        ],
+        // match: [
+        //     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        //     "Please provide a valid username",
+        // ],
     },
     password: {
         type: String,
@@ -44,9 +44,8 @@ const signinSchema = new mongoose.Schema({
 
 // Hash the password before saving for `userSchema`
 Register.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
