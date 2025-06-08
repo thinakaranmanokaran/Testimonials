@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 
-const InputBox = ({ type = "text", label = "name", showPassword = "no", value, onChange, setValue }) => {
+const InputBox = ({
+    type = "text",
+    label = "name",
+    showPassword = "no",
+    value,
+    onChange,
+    setValue,
+    error, setError,
+    validate = "no"
+}) => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     const togglePasswordVisibility = () => {
@@ -10,21 +19,31 @@ const InputBox = ({ type = "text", label = "name", showPassword = "no", value, o
 
     const inputType = type === 'password' && isPasswordVisible ? 'text' : type;
 
+    useEffect(() => {
+        if (validate === "yes") {
+            if (value && value.length < 6) {
+                setError("Minimum 6 characters required");
+            } else {
+                setError("");
+            }
+        }
+    }, [value, validate]);
+
     return (
         <div className="relative w-full">
             <input
                 type={inputType}
                 value={value}
                 onChange={onChange || ((e) => setValue && setValue(e.target.value))}
-                className={`peer p-3 pt-4 border-2 border-bgdark rounded-xl w-full placeholder-transparent focus:outline-none ${type === "password" || isPasswordVisible ? "pr-10" : "pr-3"
+                className={`peer p-3 pt-4 border-2 ${error ? "border-red-400" : "border-bgdark"} rounded-xl w-full placeholder-transparent focus:outline-none ${type === "password" || isPasswordVisible ? "pr-10" : "pr-3"
                     }`}
             />
             <label
-                className={`absolute left-3 transition-all duration-300 bg-white px-1 text-bgdark pointer-events-none 
-            ${value ? '-top-1.5 text-sm' : 'top-1/2 -translate-y-1/2 text-base'} 
-            peer-focus:-top-1.5 peer-focus:text-sm peer-focus:-translate-y-0`}
+                className={`absolute left-3 transition-all duration-300 bg-white px-1 ${error ? "text-red-400" : "text-bgdark"} pointer-events-none 
+                ${value ? '-top-1.5 text-sm' : 'top-1/2 -translate-y-1/2 text-base'} 
+                peer-focus:-top-1.5 peer-focus:text-sm peer-focus:-translate-y-0`}
             >
-                {label}
+                {error ? error : label}
             </label>
 
             {showPassword === 'yes' && (

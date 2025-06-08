@@ -37,8 +37,6 @@ const Register = () => {
         setGoToSignin(false);
     };
 
-
-
     const RegisterForm = () => {
         const [name, setName] = useState('');
         const [email, setEmail] = useState(identifier); // from parent state
@@ -110,13 +108,15 @@ const Register = () => {
         );
     };
 
-
     const VerificationForm = () => {
         const [identifier, setIdentifier] = useState('');
         const [result, setResult] = useState(null);
         const [loading, setLoading] = useState(false);
         const [errorMsg, setErrorMsg] = useState('');
         const [value, setValue] = useState('');
+        const [validate, setValidate] = useState('yes');
+
+        // const isDisabled = // if input empty and input is invalid and button is loading  
 
         const handleCheck = async () => {
             if (!identifier.trim()) {
@@ -130,18 +130,17 @@ const Register = () => {
             setResult(null);
 
             try {
-                const res = await axios.post(`${API_URL}/api/public/identifier`, {
-                    identifier
-                });
+                const res = await axios.post(`${API_URL}/api/public/identifier`, { identifier });
 
                 if (res.data.exists) {
                     setResult({ found: true, user: res.data.user });
-                    setVerifiedUsername(res.data.user.username || identifier); // set verified username
-                    handleOpenSignin(); // 👉 go to SignIn form
+                    setVerifiedUsername(res.data.user.username || identifier);
+                    handleOpenSignin(); // go to SignIn form
                 } else {
                     setResult({ found: false });
-                    setIdentifier(identifier); // pass value to register form
-                    setGoToRegister(true); // 👉 go to Register form
+                    setErrorMsg('No account found with this username or email.');
+                    setIdentifier(identifier);
+                    setGoToRegister(true); // go to Register form
                 }
             } catch (error) {
                 console.error('Error identifying user:', error);
@@ -155,21 +154,24 @@ const Register = () => {
             <div className="space-y-4 w-3/4">
                 <InputBox
                     type="text"
-                    label="Username or Email"
+                    label={errorMsg || "Username or Email"}
+                    error={errorMsg} setError={setErrorMsg}
                     value={value}
+                    validate={validate}
                     setValue={(val) => {
                         setValue(val);
                         setIdentifier(val);
                     }}
                 />
 
-                <Button onClick={handleCheck} disabled={loading} className="w-full">
-                    {loading ? 'Checking...' : 'Check Account'}
-                </Button>
+                <Button
+                    onClick={handleCheck}
+                    loading={loading}
+                    inputValue={value}
+                    validate={validate === 'yes'}
+                    className="w-full"
+                />
 
-                {errorMsg && (
-                    <p className="text-red-500 text-sm text-center">{errorMsg}</p>
-                )}
 
                 <h4 className="text-base text-center mb-5 tracking-tight">
                     To verify that your account exists.
@@ -183,43 +185,41 @@ const Register = () => {
                         Register
                     </span>
                 </div>
-
             </div>
         );
     };
-
 
     const SignInForm = () => {
         const [username, setUsername] = useState(verifiedUsername || '');
         const [password, setPassword] = useState('');
         const [loading, setLoading] = useState(false);
         const [errorMsg, setErrorMsg] = useState('');
-    
+
         const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username);
-    
+
         const handleSignIn = async () => {
             if (!username || !password) {
                 setErrorMsg('Please enter both email and password.');
                 return;
             }
-    
+
             // if (!isEmail) {
             //     setErrorMsg('Please enter a valid email.');
             //     return;
             // }
-    
+
             setLoading(true);
             setErrorMsg('');
-    
+
             try {
                 const res = await axios.post(`${API_URL}/api/public/signin`, {
                     username,
                     password,
                 });
-    
+
                 alert('Login successful:', res.data);
                 // Store token / redirect here
-    
+
             } catch (error) {
                 console.error('Login failed:', error);
                 setErrorMsg(error.response?.data?.message || 'Invalid credentials');
@@ -227,30 +227,26 @@ const Register = () => {
                 setLoading(false);
             }
         };
-    
+
         return (
             <div className='space-y-4 w-3/4'>
                 <InputBox
                     type='text'
-                    label='Email'
+                    label='Username'
                     value={username}
                     setValue={setUsername}
                 />
                 <InputBox
                     type='password'
                     showPassword='yes'
-                    label='Password'
-                    value={password}
+                    label={errorMsg || 'Password'}
+                    value={password} error={errorMsg}
                     setValue={setPassword}
                 />
                 <Button onClick={handleSignIn} disabled={loading} className='w-full'>
                     {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
-    
-                {errorMsg && (
-                    <p className='text-red-500 text-sm text-center'>{errorMsg}</p>
-                )}
-    
+
                 <div className='space-x-1 text-[15px] flex justify-center mt-3'>
                     <span className='text-textgrey opacity-75'>If you're sure, you don't have an Account?</span>
                     <span className='underline cursor-pointer' onClick={handleOpenRegister}>Register</span>
@@ -258,8 +254,6 @@ const Register = () => {
             </div>
         );
     };
-    
-
 
     const InitialOptions = () => {
         return (
@@ -296,8 +290,6 @@ const Register = () => {
         if (!gotoRegister && !verify && gotoSignin) return <SignInForm />;
         return null;
     };
-
-
 
     return (
         <div className='bg-bggrey h-full w-full min-h-screen' >
