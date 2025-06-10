@@ -17,3 +17,8 @@ export { default as HorizontalReviewCard } from "./global/HorizontalReviewCard";
 export { default as Stats } from "./global/Stats"
 export { default as InputBox } from "./global/InputBox";
 export { default as Button } from "./global/Button";
+
+export { default as RegisterForm } from "./public/auth/RegisterForm";
+export { default as SigninForm } from "./public/auth/SigninForm";
+export { default as ValidationForm } from "./public/auth/ValidationForm";
+export { default as OTPForm } from "./public/auth/OTPForm";

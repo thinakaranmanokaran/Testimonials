@@ -1,320 +1,123 @@
 import React, { useState } from 'react'
 import images from '../../assets/images'
-import { Button, InputBox } from '../../components';
+import { Button, InputBox, RegisterForm, SigninForm, ValidationForm } from '../../components';
 import { GoArrowLeft } from "react-icons/go";
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
 const Register = () => {
-
-    const [verify, setVerify] = useState(false);
-    const [gotoRegister, setGoToRegister] = useState(false);
-    const [gotoSignin, setGoToSignin] = useState(false);
+    const [currentView, setCurrentView] = useState('initial'); // 'initial' | 'verify' | 'register' | 'signin'
     const [verifiedUsername, setVerifiedUsername] = useState('');
     const [identifier, setIdentifier] = useState('');
-
     const API_URL = import.meta.env.VITE_URL;
-    // alert(API_URL);
-    const handleVerify = () => {
-        setVerify(true);
-    }
 
-    const handleOpenRegister = () => {
-        setVerify(false);
-        setGoToSignin(false);
-        setGoToRegister(true);
-    };
+    const InitialOptions = () => (
+        <div className='w-full flex justify-center items-center flex-col font-para_inter'>
+            <div className='flex flex-col items-center w-full max-w-80 space-y-4'>
+                <h4 className='text-base text-center mb-5'>Please choose your Registration method.</h4>
 
-    const handleOpenSignin = () => {
-        setVerify(false);
-        setGoToRegister(false);
-        setGoToSignin(true);
-    };
+                <button className='flex items-center justify-center p-1 pr-3 rounded-full border-textgrey border-[1px] w-full cursor-pointer'>
+                    <img src={images.GoogleLogo} className='w-10 h-10' alt='Google Logo' />
+                    <span>Register using Google</span>
+                </button>
 
-    const handleOpenInitial = () => {
-        setVerify(false);
-        setGoToRegister(false);
-        setGoToSignin(false);
-    };
-
-    const RegisterForm = () => {
-        const [name, setName] = useState('');
-        const [email, setEmail] = useState(identifier); // from parent state
-        const [username, setUsername] = useState('');
-        const [password, setPassword] = useState('');
-        const [loading, setLoading] = useState(false);
-        const [errorMsg, setErrorMsg] = useState('');
-
-        const handleRegister = async () => {
-            if (!name || !email || !username || !password) {
-                setErrorMsg("Please fill all the fields.");
-                return;
-            }
-
-            setLoading(true);
-            setErrorMsg('');
-
-            try {
-                const res = await axios.post(`${API_URL}/api/public/register`, {
-                    name,
-                    email,
-                    username,
-                    password,
-                });
-
-                const token = res.data.token;
-                localStorage.setItem('token', token);
-
-                const decoded = jwtDecode(token);
-                console.log("Decoded user:", decoded);
-
-                // You can navigate or show success here
-                alert('Registered successfully!');
-                // handleOpenInitial(); // Optional: Go back to initial screen
-                setName('');
-                setEmail('');
-                setUsername('');
-                setPassword('');
-            } catch (err) {
-                console.error('Registration failed:', err);
-                alert('Registration failed:', err);
-                setErrorMsg(err.response?.data?.message || 'Registration failed');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        return (
-            <div className='w-full'>
-                <div className='w-full grid grid-cols-2 gap-4'>
-                    <InputBox type='text' label='Name' value={name} setValue={setName} />
-                    <InputBox type='email' label='Email' value={email} setValue={setEmail} />
-                    <InputBox type='text' label='Username' value={username} setValue={setUsername} />
-                    <InputBox type='password' showPassword='yes' label='Password' value={password} setValue={setPassword} />
-                    <Button className="col-span-2" onClick={handleRegister} disabled={loading}>
-                        {loading ? 'Registering...' : 'Register'}
-                    </Button>
+                <div className='w-full flex justify-center items-center space-x-2'>
+                    <div className='bg-textgrey w-full h-[1px] mt-1 opacity-30'></div>
+                    <div className='text-textgrey opacity-60 text-sm'>or</div>
+                    <div className='bg-textgrey w-full h-[1px] mt-1 opacity-30'></div>
                 </div>
 
-                {errorMsg && (
-                    <p className="text-red-500 text-sm mt-2 text-center col-span-2">{errorMsg}</p>
-                )}
+                <button
+                    className='flex items-center justify-center p-1 pr-3 rounded-full bg-bgyellow border-textgrey border-[1px] w-full space-x-2 cursor-pointer'
+                    onClick={() => setCurrentView('verify')}
+                >
+                    <img src={images.Logo} className='w-6 h-10' alt='Rumoro Logo' />
+                    <span>
+                        Create an Account in <span className='font-semibold'>Rumoro</span>
+                    </span>
+                </button>
 
-                <div className='space-x-1 text-[15px] flex justify-center mt-4'>
+                <div className='space-x-1 text-sm'>
                     <span className='text-textgrey opacity-75'>Already have an Account?</span>
-                    <span className='underline cursor-pointer' onClick={handleOpenSignin}>SignIn</span>
-                </div>
-            </div>
-        );
-    };
-
-    const VerificationForm = () => {
-        const [identifier, setIdentifier] = useState('');
-        const [result, setResult] = useState(null);
-        const [loading, setLoading] = useState(false);
-        const [errorMsg, setErrorMsg] = useState('');
-        const [value, setValue] = useState('');
-        const [validate, setValidate] = useState('yes');
-
-        // const isDisabled = // if input empty and input is invalid and button is loading  
-
-        const handleCheck = async () => {
-            if (!identifier.trim()) {
-                setErrorMsg('Please enter a valid username or email.');
-                setResult(null);
-                return;
-            }
-
-            setLoading(true);
-            setErrorMsg('');
-            setResult(null);
-
-            try {
-                const res = await axios.post(`${API_URL}/api/public/identifier`, { identifier });
-
-                if (res.data.exists) {
-                    setResult({ found: true, user: res.data.user });
-                    setVerifiedUsername(res.data.user.username || identifier);
-                    handleOpenSignin(); // go to SignIn form
-                } else {
-                    setResult({ found: false });
-                    setErrorMsg('No account found with this username or email.');
-                    setIdentifier(identifier);
-                    setGoToRegister(true); // go to Register form
-                }
-            } catch (error) {
-                console.error('Error identifying user:', error);
-                setErrorMsg(error.response?.data?.message || 'Server error');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        return (
-            <div className="space-y-4 w-3/4">
-                <InputBox
-                    type="text"
-                    label={errorMsg || "Username or Email"}
-                    error={errorMsg} setError={setErrorMsg}
-                    value={value}
-                    validate={validate}
-                    setValue={(val) => {
-                        setValue(val);
-                        setIdentifier(val);
-                    }}
-                />
-
-                <Button
-                    onClick={handleCheck}
-                    loading={loading}
-                    inputValue={value}
-                    validate={validate === 'yes'}
-                    className="w-full"
-                />
-
-
-                <h4 className="text-base text-center mb-5 tracking-tight">
-                    To verify that your account exists.
-                </h4>
-
-                <div className="space-x-1 text-[15px] flex justify-center -mt-2">
-                    <span className="text-textgrey opacity-75">
-                        If you're sure you don't have an account?
-                    </span>
-                    <span className="underline cursor-pointer" onClick={handleOpenRegister}>
-                        Register
+                    <span className='underline cursor-pointer' onClick={() => setCurrentView('signin')}>
+                        SignIn
                     </span>
                 </div>
             </div>
-        );
-    };
-
-    const SignInForm = () => {
-        const [username, setUsername] = useState(verifiedUsername || '');
-        const [password, setPassword] = useState('');
-        const [loading, setLoading] = useState(false);
-        const [errorMsg, setErrorMsg] = useState('');
-
-        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username);
-
-        const handleSignIn = async () => {
-            if (!username || !password) {
-                setErrorMsg('Please enter both email and password.');
-                return;
-            }
-
-            // if (!isEmail) {
-            //     setErrorMsg('Please enter a valid email.');
-            //     return;
-            // }
-
-            setLoading(true);
-            setErrorMsg('');
-
-            try {
-                const res = await axios.post(`${API_URL}/api/public/signin`, {
-                    username,
-                    password,
-                });
-
-                alert('Login successful:', res.data);
-                // Store token / redirect here
-
-            } catch (error) {
-                console.error('Login failed:', error);
-                setErrorMsg(error.response?.data?.message || 'Invalid credentials');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        return (
-            <div className='space-y-4 w-3/4'>
-                <InputBox
-                    type='text'
-                    label='Username'
-                    value={username}
-                    setValue={setUsername}
-                />
-                <InputBox
-                    type='password'
-                    showPassword='yes'
-                    label={errorMsg || 'Password'}
-                    value={password} error={errorMsg}
-                    setValue={setPassword}
-                />
-                <Button onClick={handleSignIn} disabled={loading} className='w-full'>
-                    {loading ? 'Signing in...' : 'Sign In'}
-                </Button>
-
-                <div className='space-x-1 text-[15px] flex justify-center mt-3'>
-                    <span className='text-textgrey opacity-75'>If you're sure, you don't have an Account?</span>
-                    <span className='underline cursor-pointer' onClick={handleOpenRegister}>Register</span>
-                </div>
-            </div>
-        );
-    };
-
-    const InitialOptions = () => {
-        return (
-            <div className='w-full flex justify-center  items-center  flex-col font-para_inter ' >
-
-                <div className='flex flex-col items-center w-full max-w-80 space-y-4 ' >
-                    <h4 className='text-base text-center mb-5' >Please choose your Registration method.</h4>
-
-                    <button className='flex items-center justify-center p-1 pr-3 rounded-full border-textgrey border-[1px] w-full cursor-pointer' >
-                        <img src={images.GoogleLogo} className='w-10 h-10' alt="" srcset="" />
-                        <span>Register using Google</span>
-                    </button>
-                    <div className='w-full flex justify-center items-center space-x-2 ' >
-                        <div className="bg-textgrey w-full h-[1px] mt-1 opacity-30 "></div>
-                        <div className="text-textgrey opacity-60 text-sm">or</div>
-                        <div className="bg-textgrey w-full h-[1px] mt-1 opacity-30  "></div>
-                    </div>
-                    <button className='flex items-center justify-center p-1 pr-3 rounded-full bg-bgyellow border-textgrey border-[1px] w-full space-x-2 cursor-pointer' onClick={handleVerify} >
-                        <img src={images.Logo} className='w-6 h-10' alt="" srcset="" />
-                        <span>Create a Account in <span className='font-semibold' >Rumoro</span> </span>
-                    </button>
-                    <div className='space-x-1 text-sm' >
-                        <span className='text-textgrey opacity-75' >Already have an Account?</span><span className='underline cursor-pointer' onClick={handleOpenSignin}>SignIn</span>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+        </div>
+    );
 
     const renderContent = () => {
-        if (!gotoRegister && !verify && !gotoSignin) return <InitialOptions />;
-        if (verify && !gotoRegister && !gotoSignin) return <VerificationForm />;
-        if (gotoRegister && !verify && !gotoSignin) return <RegisterForm />;
-        if (!gotoRegister && !verify && gotoSignin) return <SignInForm />;
-        return null;
+        if (currentView === 'verify') {
+            return (
+                <ValidationForm
+                    API_URL={API_URL}
+                    setVerifiedUsername={setVerifiedUsername}
+                    setIdentifier={setIdentifier}
+                    handleOpenSignin={() => setCurrentView('signin')}
+                    setGoToRegister={() => setCurrentView('register')}
+                />
+            );
+        }
+
+        if (currentView === 'register') {
+            return (
+                <RegisterForm
+                    API_URL={API_URL}
+                    identifier={identifier}
+                    handleOpenSignin={() => setCurrentView('signin')}
+                />
+            );
+        }
+
+        if (currentView === 'signin') {
+            return (
+                <SigninForm
+                    API_URL={API_URL}
+                    verifiedUsername={verifiedUsername}
+                    handleOpenRegister={() => setCurrentView('register')}
+                />
+            );
+        }
+
+        return <InitialOptions />;
     };
 
     return (
-        <div className='bg-bggrey h-full w-full min-h-screen' >
-            <div className='flex justify-center items-center h-screen w-full  ' >
-                <div className='bg-white h-full w-full max-w-3/4 max-h-3/4 overflow-auto shadow-md flex rounded-4xl relative' >
-                    {
-                        (gotoRegister || verify || gotoSignin) && (
-                            <button className='absolute top-3 left-3 bg-[#00000010] p-2 hover:rotate-45 transition-transform duration-300 cursor-pointer rounded-full text-2xl ' onClick={handleOpenInitial} ><GoArrowLeft className='' /></button>)
-                    }
-                    <div className='w-3/5 p-4  ' >
-                        <div className='w-full flex   items-center h-full flex-col font-para_inter ' >
-                            <div className=' h-40 flex items-center' >
-                                <h1 className='text-4xl font-title_inter tracking-tighter ' >Welcome to Rumoro</h1>
+        <div className='bg-bggrey h-full w-full min-h-screen'>
+            <div className='flex justify-center items-center h-screen w-full'>
+                <div className='bg-white h-full w-full max-w-3/4 max-h-3/4 overflow-auto shadow-md flex rounded-4xl relative'>
+
+                    <div className='w-3/5 p-4'>
+                        <div className='w-full flex items-center h-full flex-col font-para_inter'>
+                            <div className='h-40 flex items-center'>
+                                <h1 className='text-4xl font-title_inter tracking-tighter'>Welcome to Rumoro</h1>
                             </div>
                             {renderContent()}
-                            {/* <InitialOptions /> */}
                         </div>
                     </div>
-                    <div className='w-2/4  h-full  overflow-hidden' >
-                        <img src={images.Register} className='h-full w-full object-cover object-center ' alt="" srcset="" />
+
+                    <div className='w-2/4 h-full overflow-hidden'>
+                        <img
+                            src={images.Register}
+                            className='h-full w-full object-cover object-center'
+                            alt='Register Visual'
+                        />
                     </div>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Register
+export default Register;
+
+
+{/* {(gotoRegister || verify || gotoSignin) && (
+                        <button
+                            className='absolute top-3 left-3 bg-[#00000010] p-2 hover:rotate-45 transition-transform duration-300 cursor-pointer rounded-full text-2xl'
+                            onClick={handleOpenInitial}
+                        >
+                            <GoArrowLeft />
+                        </button>
+                    )} */}
