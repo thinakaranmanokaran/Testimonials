@@ -87,7 +87,14 @@ const Register = () => {
         <div className='bg-bggrey h-full w-full min-h-screen'>
             <div className='flex justify-center items-center h-screen w-full'>
                 <div className='bg-white h-full w-full max-w-3/4 max-h-3/4 overflow-auto shadow-md flex rounded-4xl relative'>
-
+                    {currentView !== 'initial' && (
+                        <button
+                            className='absolute top-3 left-3 bg-[#00000010] p-2 hover:rotate-45 transition-transform duration-300 cursor-pointer rounded-full text-2xl'
+                            onClick={() => setCurrentView('initial')}
+                        >
+                            <GoArrowLeft />
+                        </button>
+                    )}
                     <div className='w-3/5 p-4'>
                         <div className='w-full flex items-center h-full flex-col font-para_inter'>
                             <div className='h-40 flex items-center'>
@@ -111,13 +118,3 @@ const Register = () => {
 };
 
 export default Register;
-
-
-{/* {(gotoRegister || verify || gotoSignin) && (
-                        <button
-                            className='absolute top-3 left-3 bg-[#00000010] p-2 hover:rotate-45 transition-transform duration-300 cursor-pointer rounded-full text-2xl'
-                            onClick={handleOpenInitial}
-                        >
-                            <GoArrowLeft />
-                        </button>
-                    )} */}

@@ -52,9 +52,7 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin }) => {
                 <InputBox type='email' label='Email' value={email} setValue={setEmail} />
                 <InputBox type='text' label='Username' value={username} setValue={setUsername} />
                 <InputBox type='password' showPassword='yes' label='Password' value={password} setValue={setPassword} />
-                <Button className="col-span-2" onClick={handleRegister} disabled={loading}>
-                    {loading ? 'Registering...' : 'Register'}
-                </Button>
+                <Button className="col-span-2" onClick={handleRegister} loading={loading} inputValue={ name && username && email && password } />
             </div>
             {errorMsg && <p className="text-red-500 text-sm mt-2 text-center col-span-2">{errorMsg}</p>}
             <div className='space-x-1 text-[15px] flex justify-center mt-4'>

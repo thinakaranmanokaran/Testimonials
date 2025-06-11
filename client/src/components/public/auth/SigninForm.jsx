@@ -19,7 +19,7 @@ const SigninForm = ({ verifiedUsername, API_URL, handleOpenRegister }) => {
 
         try {
             const res = await axios.post(`${API_URL}/api/public/signin`, { username, password });
-            alert('Login successful:', res.data);
+            alert('Login successful:', res.data); 
         } catch (error) {
             console.error('Login failed:', error);
             setErrorMsg(error.response?.data?.message || 'Invalid credentials');
@@ -39,9 +39,7 @@ const SigninForm = ({ verifiedUsername, API_URL, handleOpenRegister }) => {
                 error={errorMsg}
                 setValue={setPassword}
             />
-            <Button onClick={handleSignIn} disabled={loading} className='w-full'>
-                {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
+            <Button onClick={handleSignIn}  validate={false} loading={loading}  className='w-full' inputValue={password}/>
             <div className='space-x-1 text-[15px] flex justify-center mt-3'>
                 <span className='text-textgrey opacity-75'>If you're sure, you don't have an Account?</span>
                 <span className='underline cursor-pointer' onClick={handleOpenRegister}>Register</span>
