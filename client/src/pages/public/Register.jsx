@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import images from '../../assets/images'
 import { Button, InputBox, RegisterForm, SigninForm, ValidationForm } from '../../components';
 import { GoArrowLeft } from "react-icons/go";
@@ -6,10 +6,16 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
 const Register = () => {
-    const [currentView, setCurrentView] = useState('initial'); // 'initial' | 'verify' | 'register' | 'signin'
+    const [currentView, setCurrentView] = useState(() => {
+        return localStorage.getItem('currentView') || 'initial';
+    }); // 'initial' | 'verify' | 'register' | 'signin'
     const [verifiedUsername, setVerifiedUsername] = useState('');
     const [identifier, setIdentifier] = useState('');
     const API_URL = import.meta.env.VITE_URL;
+
+    useEffect(() => {
+        localStorage.setItem('currentView', currentView);
+    }, [currentView]);
 
     const InitialOptions = () => (
         <div className='w-full flex justify-center items-center flex-col font-para_inter'>

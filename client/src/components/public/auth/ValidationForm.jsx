@@ -35,8 +35,14 @@ const ValidationForm = ({ API_URL, setVerifiedUsername, setIdentifier, handleOpe
                 setGoToRegister(true);
             }
         } catch (error) {
-            console.error('Error identifying user:', error);
-            setErrorMsg(error.response?.data?.message || 'Server error');
+            if (error.response?.status === 404) {
+                setResult({ found: false });
+                setErrorMsg('No account found with this username or email.');
+                setIdentifier(identifier);
+            } else {
+                console.error('Error identifying user:', error);
+                setErrorMsg(error.response?.data?.message || 'Server error');
+            }
         } finally {
             setLoading(false);
         }
