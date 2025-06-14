@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import images from '../../assets/images'
-import { Button, InputBox, RegisterForm, SigninForm, ValidationForm } from '../../components';
+import { Button, InputBox, OTPForm, RegisterForm, SigninForm, ValidationForm } from '../../components';
 import { GoArrowLeft } from "react-icons/go";
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
@@ -24,7 +24,7 @@ const Register = () => {
 
                 <button className='flex items-center justify-center p-1 pr-3 rounded-full border-textgrey border-[1px] w-full cursor-pointer'>
                     <img src={images.GoogleLogo} className='w-10 h-10' alt='Google Logo' />
-                    <span>Register using Google</span>
+                    <span>Register using Google</span> 
                 </button>
 
                 <div className='w-full flex justify-center items-center space-x-2'>
@@ -71,8 +71,15 @@ const Register = () => {
                 <RegisterForm
                     API_URL={API_URL}
                     identifier={identifier}
-                    handleOpenSignin={() => setCurrentView('signin')}
+                    setIdentifier={setIdentifier}
+                    handleOpenOTPForm={() => setCurrentView('otpform')}
                 />
+            );
+        }
+
+        if (currentView === 'otpform') {
+            return (
+                <OTPForm identifier={identifier} API_URL={API_URL} />
             );
         }
 

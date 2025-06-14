@@ -1,6 +1,6 @@
-const { Register } = require('./../../models');
-const sendToken = require('./../../utils/jwtHelper');
+const { Register, OTP } = require('./../../models');
 const bcrypt = require('bcryptjs'); // For password hashing and comparison
+const { sendOtpEmail, sendToken } = require('../../utils');
 
 // Register a new user
 exports.registerUser = async (req, res) => {
@@ -180,5 +180,44 @@ exports.checkUserExistence = async (req, res) => {
     } catch (error) {
         console.error('Error in checkUserExistence:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.initiateRegistration = async (req, res) => {
+    const { name, email, phoneNo, username, password } = req.body;
+
+    try {
+        if (!name || !email || !username || !password) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        // Check email & username
+        const emailExists = await Register.findOne({ email });
+        if (emailExists) return res.status(409).json({ message: 'Email is already registered' });
+
+        const usernameExists = await Register.findOne({ username });
+        if (usernameExists) return res.status(409).json({ message: 'Username is already taken' });
+
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+        // Save OTP
+        await OTP.findOneAndUpdate(
+            { email },
+            { otp, expiresAt },
+            { upsert: true, new: true }
+        );
+
+        // Send OTP
+        await sendOtpEmail(email, otp);
+
+        res.status(200).json({
+            message: 'OTP sent to email. Please verify to complete registration.',
+            userData: { name, email, phoneNo, username, password } // frontend will use this
+        });
+    } catch (error) {
+        console.error('Error in initiateRegistration:', error);
+        res.status(500).json({ message: 'Failed to initiate registration' });
     }
 };

@@ -1,6 +1,7 @@
 // controllers/auth/sendOtp.js
-const { OTP } = require('../../models');
-const { sendOtpEmail } = require('../../utils');
+const { OTP, Register } = require('../../models');
+const { sendOtpEmail, sendToken } = require('../../utils');
+const bcrypt = require('bcryptjs'); 
 
 exports.sendOtpToEmail = async (req, res) => {
     const { email } = req.body;
@@ -54,5 +55,45 @@ exports.verifyOtp = async (req, res) => {
     } catch (error) {
         console.error('OTP Verification Error:', error);
         res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.verifyOtpAndRegister = async (req, res) => {
+    const { name, email, username, password, otp } = req.body;
+
+    try {
+        const otpRecord = await OTP.findOne({ email });
+        if (!otpRecord) return res.status(400).json({ message: 'OTP not Created for this Email' });
+
+        if (otpRecord.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
+        if (otpRecord.expiresAt < new Date()) return res.status(400).json({ message: 'OTP expired' });
+
+        // Clean OTP record
+        await OTP.deleteOne({ email });
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Assign role
+        const adminEmail = process.env.ADMIN_MAIL;
+        const employeeEmail = process.env.EMP_MAIL;
+        const role =
+            email === adminEmail ? 'admin' :
+            email === employeeEmail ? 'employee' : 'user';
+
+        // Save user
+        const user = await Register.create({
+            name,
+            email,
+            username,
+            password: hashedPassword,
+            role,
+        });
+
+        // Send token response
+        sendToken(user, 201, res);
+    } catch (error) {
+        console.error('Error in verifyOtpAndRegister:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };

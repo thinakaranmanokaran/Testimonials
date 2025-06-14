@@ -3,7 +3,7 @@ import { InputBox, Button } from '../../../components';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const RegisterForm = ({ identifier, API_URL, handleOpenSignin }) => {
+const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm, setIdentifier }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState(identifier);
     const [username, setUsername] = useState('');
@@ -51,7 +51,7 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin }) => {
             newErrors.email = 'Invalid email';
         } else if (email.length > 50) {
             newErrors.email = 'Max 50 characters';
-        }   
+        }
 
         // Username validation
         if (!username) {
@@ -102,6 +102,13 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin }) => {
             setEmail('');
             setUsername('');
             setPassword('');
+
+            // After successful registration
+            await axios.post(`${API_URL}/api/public/send-otp`, { email });
+            setIdentifier(email);  // ✅ This updates the parent with email for OTPForm
+            handleOpenOTPForm();  // ✅ Now OTPForm will receive correct identifier
+
+
         } catch (err) {
             const status = err.response?.status;
             const msg = err.response?.data?.message || 'Registration failed';

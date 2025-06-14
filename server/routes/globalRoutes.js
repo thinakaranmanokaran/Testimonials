@@ -1,11 +1,12 @@
 const express = require('express');
 const globalRouter = express.Router();
 
-const { registerUser, getAuthData, updateUserProfile, signinUser, postContact, getContact, getContactByEmail, deleteContact, updateContact, sendOtpToEmail, verifyOtp, checkUserExistence } = require('../controllers');
+const { registerUser, getAuthData, updateUserProfile, signinUser, postContact, getContact, getContactByEmail, deleteContact, updateContact, sendOtpToEmail, verifyOtp, checkUserExistence, verifyOtpAndRegister, initiateRegistration } = require('../controllers');
 const { registerRequest, signinRequest, ContactRequest } = require('../middlewares');
 
 // Registration route
 globalRouter.post('/register', registerRequest, registerUser);
+globalRouter.post('/register-with-otp', registerRequest, initiateRegistration);
 globalRouter.post('/identifier', checkUserExistence); 
 globalRouter.get('/register/data/:email', getAuthData);
 globalRouter.put('/register/update/:email', updateUserProfile);
@@ -16,6 +17,7 @@ globalRouter.post('/signin', signinRequest, signinUser);
 // OTP routes
 globalRouter.post('/send-otp', sendOtpToEmail);
 globalRouter.post('/verify-otp', verifyOtp);
+globalRouter.post('/verify-otp-and-register', verifyOtpAndRegister);
 
 // Contact routes
 globalRouter.post('/contact', ContactRequest, postContact);
