@@ -1,7 +1,7 @@
 // controllers/auth/sendOtp.js
-const { OTP, Register } = require('../../models');
+const { OTP, Register, TempUser } = require('../../models');
 const { sendOtpEmail, sendToken } = require('../../utils');
-const bcrypt = require('bcryptjs'); 
+const bcrypt = require('bcryptjs');
 
 exports.sendOtpToEmail = async (req, res) => {
     const { email } = req.body;
@@ -58,6 +58,46 @@ exports.verifyOtp = async (req, res) => {
     }
 };
 
+// controllers/auth/verifyOtp.js
+exports.verifyHashedOtp = async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        const otpRecord = await OTP.findOne({ email });
+        if (!otpRecord) return res.status(400).json({ message: 'OTP not found' });
+
+        const isMatch = await bcrypt.compare(otp, otpRecord.otp);
+        if (!isMatch) return res.status(400).json({ message: 'Invalid OTP' });
+
+        if (otpRecord.expiresAt < new Date()) {
+            return res.status(400).json({ message: 'OTP expired' });
+        }
+
+        // Fetch temp user
+        const tempUser = await TempUser.findOne({ email });
+        if (!tempUser) return res.status(400).json({ message: 'User session expired' });
+
+        // Move to permanent users
+        const user = await Register.create({
+            name: tempUser.name,
+            email: tempUser.email,
+            username: tempUser.username,
+            phoneNo: tempUser.phoneNo,
+            password: tempUser.password,
+            role: tempUser.role
+        });
+
+        // Clean up
+        await TempUser.deleteOne({ email });
+        await OTP.deleteOne({ email });
+
+        sendToken(user, 201, res);
+    } catch (error) {
+        console.error('OTP Verification Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 exports.verifyOtpAndRegister = async (req, res) => {
     const { name, email, username, password, otp } = req.body;
 
@@ -79,7 +119,7 @@ exports.verifyOtpAndRegister = async (req, res) => {
         const employeeEmail = process.env.EMP_MAIL;
         const role =
             email === adminEmail ? 'admin' :
-            email === employeeEmail ? 'employee' : 'user';
+                email === employeeEmail ? 'employee' : 'user';
 
         // Save user
         const user = await Register.create({

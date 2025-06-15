@@ -1,4 +1,4 @@
-const { Register, OTP } = require('./../../models');
+const { Register, OTP, TempUser } = require('./../../models');
 const bcrypt = require('bcryptjs'); // For password hashing and comparison
 const { sendOtpEmail, sendToken } = require('../../utils');
 
@@ -64,6 +64,52 @@ exports.registerUser = async (req, res) => {
     }
 };
 
+exports.tempRegisterUser = async (req, res) => {
+    try {
+        const { name, email, username, phoneNo, password } = req.body;
+
+        if (!name || !email || !username || !password) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        // Check for duplicates in TempUser or Register
+        const emailExists = await TempUser.findOne({ email }) || await Register.findOne({ email });
+        const usernameExists = await TempUser.findOne({ username }) || await Register.findOne({ username });
+
+        if (emailExists) return res.status(409).json({ message: 'Email already registered' });
+        if (usernameExists) return res.status(409).json({ message: 'Username already taken' });
+
+        // Assign role
+        const role =
+            email === process.env.ADMIN_MAIL ? 'admin' :
+                email === process.env.EMP_MAIL ? 'employee' : 'user';
+
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const hashedOtp = await bcrypt.hash(otp, 10);
+
+        // Set expiry to 10 minutes
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+        // Save hashed OTP in DB
+        await OTP.findOneAndUpdate(
+            { email },
+            { otp: hashedOtp, expiresAt },
+            { upsert: true, new: true }
+        );
+
+        // ✅ Send plain OTP (not hashed) to user's email
+        await sendOtpEmail(email, otp);  // just use the original otp here
+
+        // Save to TempUser
+        await TempUser.create({ name, email, username, password, role });
+
+        res.status(201).json({ message: "Registered temporarily. Please verify OTP.", userData: { name, email, username } });
+    } catch (err) {
+        console.error("Temp Register Error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
 exports.getAuthData = async (req, res) => {
     const { email } = req.params;
