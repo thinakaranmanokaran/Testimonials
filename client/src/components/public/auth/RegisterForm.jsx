@@ -22,6 +22,7 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm
         const numberRegex = /[0-9]/;
         const alphaRegex = /[A-Za-z]/;
         const whitespaceRegex = /\s/;
+        const capitalRegex = /[A-Z]/;
 
         const newErrors = {
             name: '',
@@ -60,6 +61,8 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm
             newErrors.username = 'Max 16 characters';
         } else if (whitespaceRegex.test(username)) {
             newErrors.username = 'No spaces';
+        } else if (capitalRegex.test(username)) {
+            newErrors.username = 'No capital letters allowed';
         }
 
         // Password validation

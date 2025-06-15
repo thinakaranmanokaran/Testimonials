@@ -4,18 +4,44 @@ import { Button, InputBox, OTPForm, RegisterForm, SigninForm, ValidationForm } f
 import { GoArrowLeft } from "react-icons/go";
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Register = () => {
     const [currentView, setCurrentView] = useState(() => {
-        return localStorage.getItem('currentView') || 'initial';
+        const stored = localStorage.getItem('currentView');
+        if (stored) {
+            try {
+                const { view, timestamp } = JSON.parse(stored);
+                const now = new Date().getTime();
+                if (now - timestamp < 3600000) { // within 1 hour
+                    return view;
+                } else {
+                    localStorage.removeItem('currentView'); // expired
+                }
+            } catch {
+                localStorage.removeItem('currentView'); // corrupted
+            }
+        }
+        return 'initial';
     }); // 'initial' | 'verify' | 'register' | 'signin'
     const [verifiedUsername, setVerifiedUsername] = useState('');
     const [identifier, setIdentifier] = useState('');
     const API_URL = import.meta.env.VITE_URL;
 
     useEffect(() => {
-        localStorage.setItem('currentView', currentView);
+        const data = {
+            view: currentView,
+            timestamp: new Date().getTime()
+        };
+        localStorage.setItem('currentView', JSON.stringify(data));
     }, [currentView]);
+
+    const variants = {
+        initial: { opacity: 0, x: 50 },
+        animate: { opacity: 1, x: 0, transition: { duration: 0.5 } },
+        exit: { opacity: 0, y: 30, transition: { duration: 0.3 } }
+    };
+
 
     const InitialOptions = () => (
         <div className='w-full flex justify-center items-center flex-col font-para_inter'>
@@ -24,7 +50,7 @@ const Register = () => {
 
                 <button className='flex items-center justify-center p-1 pr-3 rounded-full border-textgrey border-[1px] w-full cursor-pointer'>
                     <img src={images.GoogleLogo} className='w-10 h-10' alt='Google Logo' />
-                    <span>Register using Google</span> 
+                    <span>Register using Google</span>
                 </button>
 
                 <div className='w-full flex justify-center items-center space-x-2'>
@@ -54,52 +80,90 @@ const Register = () => {
     );
 
     const renderContent = () => {
-        if (currentView === 'verify') {
-            return (
-                <ValidationForm
-                    API_URL={API_URL}
-                    setVerifiedUsername={setVerifiedUsername}
-                    setIdentifier={setIdentifier}
-                    handleOpenSignin={() => setCurrentView('signin')}
-                    setGoToRegister={() => setCurrentView('register')}
-                />
-            );
-        }
+        return (
+            <AnimatePresence mode="wait">
+                {currentView === 'verify' && (
+                    <motion.div
+                        key="verify"
+                        initial="initial"
+                        animate="animate" className='w-full flex justify-center items-center'
+                        exit="exit"
+                        variants={variants}
+                    >
+                        <ValidationForm
+                            API_URL={API_URL}
+                            setVerifiedUsername={setVerifiedUsername}
+                            setIdentifier={setIdentifier}
+                            handleOpenSignin={() => setCurrentView('signin')}
+                            setGoToRegister={() => setCurrentView('register')}
+                        />
+                    </motion.div>
+                )}
 
-        if (currentView === 'register') {
-            return (
-                <RegisterForm
-                    API_URL={API_URL}
-                    identifier={identifier}
-                    setIdentifier={setIdentifier}
-                    handleOpenOTPForm={() => setCurrentView('otpform')}
-                />
-            );
-        }
+                {currentView === 'register' && (
+                    <motion.div
+                        key="register"
+                        initial="initial"
+                        animate="animate"
+                        exit="exit" className='w-full  flex justify-center items-center'
+                        variants={variants}
+                    >
+                        <RegisterForm
+                            API_URL={API_URL}
+                            identifier={identifier}
+                            setIdentifier={setIdentifier} handleOpenSignin={() => setCurrentView('signin')}
+                            handleOpenOTPForm={() => setCurrentView('otpform')}
+                        />
+                    </motion.div>
+                )}
 
-        if (currentView === 'otpform') {
-            return (
-                <OTPForm identifier={identifier} API_URL={API_URL} />
-            );
-        }
+                {currentView === 'otpform' && (
+                    <motion.div
+                        key="otpform"
+                        initial="initial"
+                        animate="animate"
+                        exit="exit" className='w-full  flex justify-center items-center'
+                        variants={variants}
+                    >
+                        <OTPForm identifier={identifier} API_URL={API_URL} />
+                    </motion.div>
+                )}
 
-        if (currentView === 'signin') {
-            return (
-                <SigninForm
-                    API_URL={API_URL}
-                    verifiedUsername={verifiedUsername}
-                    handleOpenRegister={() => setCurrentView('register')}
-                />
-            );
-        }
+                {currentView === 'signin' && (
+                    <motion.div
+                        key="signin"
+                        initial="initial"
+                        animate="animate"
+                        exit="exit" className='w-full  flex justify-center items-center'
+                        variants={variants}
+                    >
+                        <SigninForm
+                            API_URL={API_URL}
+                            verifiedUsername={verifiedUsername}
+                            handleOpenRegister={() => setCurrentView('register')}
+                        />
+                    </motion.div>
+                )}
 
-        return <InitialOptions />;
+                {currentView === 'initial' && (
+                    <motion.div
+                        key="initial"
+                        initial="initial"
+                        animate="animate"
+                        exit="exit" className='w-full  flex justify-center items-center'
+                        variants={variants}
+                    >
+                        <InitialOptions />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        );
     };
 
     return (
         <div className='bg-bggrey h-full w-full min-h-screen'>
             <div className='flex justify-center items-center h-screen w-full'>
-                <div className='bg-white h-full w-full max-w-3/4 max-h-3/4 overflow-auto shadow-md flex rounded-4xl relative'>
+                <div className='bg-white h-full w-full max-w-3/4 max-h-3/4 overflow-auto shadow-md flex rounded-4xl relative overflow-y-hidden'>
                     {currentView !== 'initial' && (
                         <button
                             className='absolute top-3 left-3 bg-[#00000010] p-2 hover:rotate-45 transition-transform duration-300 cursor-pointer rounded-full text-2xl'
@@ -117,7 +181,7 @@ const Register = () => {
                         </div>
                     </div>
 
-                    <div className='w-2/4 h-full overflow-hidden'>
+                    <div className='w-2/4 h-full overflow-hidden relative z-10'>
                         <img
                             src={images.Register}
                             className='h-full w-full object-cover object-center'
