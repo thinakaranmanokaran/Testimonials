@@ -94,12 +94,6 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm
                 name, email, username, password
             });
 
-            const token = res.data.token;
-            localStorage.setItem('token', token);
-
-            const decoded = jwtDecode(token);
-            console.log("Decoded user:", decoded);
-
             alert('Registered successfully!');
             setName('');
             setEmail('');
@@ -107,7 +101,7 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm
             setPassword('');
 
             // After successful registration
-            await axios.post(`${API_URL}/api/public/send-otp`, { email });
+            // await axios.post(`${API_URL}/api/public/send-otp`, { email });
             setIdentifier(email);  // ✅ This updates the parent with email for OTPForm
             handleOpenOTPForm();  // ✅ Now OTPForm will receive correct identifier
 
@@ -133,6 +127,7 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm
             }
 
             console.error('Registration failed:', err);
+            alert('Registration failed:', err);
         } finally {
             setLoading(false);
         }

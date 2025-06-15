@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Button, OTPInput } from '../../';
+import { jwtDecode } from 'jwt-decode';
 
 const OTPForm = ({ API_URL, identifier }) => {
     const [otpValue, setOtpValue] = useState('');
@@ -18,23 +19,30 @@ const OTPForm = ({ API_URL, identifier }) => {
             setErrorMsg('Please enter the full 6-digit OTP');
             return;
         }
-        
+        alert("Verifying:", identifier, otpValue);
+
         setLoading(true);
         setErrorMsg('');
-        
+
         try {
-            const res = await axios.post(`${API_URL}/api/public/verify-otp`, {
+            const res = await axios.post(`${API_URL}/api/public/verify-hashedotp`, {
                 email: identifier, // email passed from Register
                 otp: otpValue,
             });
-            
+
+            const token = res.data.token;
+            localStorage.setItem('token', token);
+
+            const decoded = jwtDecode(token);
+            console.log("Decoded user:", decoded);
+
             alert('OTP verified successfully!');
             // Redirect or show login here
         } catch (err) {
             const msg = err.response?.data?.message || 'Failed to verify OTP';
             setErrorMsg(msg);
             console.error('OTP verification failed:', msg);
-            alert(identifier, otpValue);
+            // alert(identifier, otpValue);
         } finally {
             setLoading(false);
         }
