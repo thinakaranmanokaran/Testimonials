@@ -5,8 +5,8 @@ const { registerUser, getAuthData, updateUserProfile, signinUser, postContact, g
 const { registerRequest, signinRequest, ContactRequest } = require('../middlewares');
 
 // Registration route
-// globalRouter.post('/register', registerRequest, registerUser);
-globalRouter.post('/register', registerRequest, tempRegisterUser);
+globalRouter.post('/register', registerRequest, registerUser);
+// globalRouter.post('/register', registerRequest, tempRegisterUser);
 globalRouter.post('/register-with-otp', registerRequest, initiateRegistration);
 globalRouter.post('/identifier', checkUserExistence); 
 globalRouter.get('/register/data/:email', getAuthData);

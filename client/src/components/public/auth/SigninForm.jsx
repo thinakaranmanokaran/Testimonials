@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { InputBox, Button } from '../../../components';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 const SigninForm = ({ verifiedUsername, API_URL, handleOpenRegister }) => {
     const [username, setUsername] = useState(verifiedUsername || '');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState({ username: '', password: '', general: '' });
+
+    const navigate = useNavigate();
 
     const handleSignIn = async () => {
         if (!username || !password) {
@@ -24,6 +27,10 @@ const SigninForm = ({ verifiedUsername, API_URL, handleOpenRegister }) => {
         try {
             const res = await axios.post(`${API_URL}/api/public/signin`, { username, password });
             alert('Login successful:', res.data);
+            const token = res.data.token;
+            localStorage.setItem('token', token);
+            
+            navigate('/'); // Redirect to home or dashboard after successful login
         } catch (error) {
             const status = error.response?.status;
             const message = error.response?.data?.message || 'Login failed';

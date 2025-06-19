@@ -10,11 +10,40 @@ const ValidationForm = ({ API_URL, setVerifiedUsername, setIdentifier, handleOpe
     const [value, setValue] = useState('');
     const [validate, setValidate] = useState('yes');
 
+    const isEmail = (str) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+    const whitespaceRegex = /\s/;
+    const capitalRegex = /[A-Z]/;
+
     const handleCheck = async () => {
-        if (!identifier.trim()) {
+        // Validation block
+        const input = value.trim();
+
+        if (!input) {
             setErrorMsg('Please enter a valid username or email.');
             setResult(null);
             return;
+        }
+
+        if (whitespaceRegex.test(input)) {
+            setErrorMsg('No spaces allowed.');
+            return;
+        }
+
+        if (isEmail(input)) {
+            if (input.length > 50) {
+                setErrorMsg('Email max 50 characters.');
+                return;
+            }
+        } else {
+            // Assuming it's a username
+            if (input.length > 16) {
+                setErrorMsg('Username max 16 characters.');
+                return;
+            }
+            if (capitalRegex.test(input)) {
+                setErrorMsg('Username must not have capital letters.');
+                return;
+            }
         }
 
         setLoading(true);
@@ -22,23 +51,23 @@ const ValidationForm = ({ API_URL, setVerifiedUsername, setIdentifier, handleOpe
         setResult(null);
 
         try {
-            const res = await axios.post(`${API_URL}/api/public/identifier`, { identifier });
+            const res = await axios.post(`${API_URL}/api/public/identifier`, { identifier: input });
 
             if (res.data.exists) {
                 setResult({ found: true, user: res.data.user });
-                setVerifiedUsername(res.data.user.username || identifier);
+                setVerifiedUsername(res.data.user.username || input);
                 handleOpenSignin();
             } else {
                 setResult({ found: false });
                 setErrorMsg('No account found with this username or email.');
-                setIdentifier(identifier);
+                setIdentifier(input);
                 setGoToRegister(true);
             }
         } catch (error) {
             if (error.response?.status === 404) {
                 setResult({ found: false });
                 setErrorMsg('No account found with this username or email.');
-                setIdentifier(identifier);
+                setIdentifier(input);
             } else {
                 console.error('Error identifying user:', error);
                 setErrorMsg(error.response?.data?.message || 'Server error');

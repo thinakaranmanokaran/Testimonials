@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Button, OTPInput } from '../../';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from "react-router-dom"
 
 const OTPForm = ({ API_URL, identifier }) => {
     const [otpValue, setOtpValue] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+
+    const navigate = useNavigate();
 
     const handleOtpChange = (value) => {
         setOtpValue(value);
@@ -19,7 +22,7 @@ const OTPForm = ({ API_URL, identifier }) => {
             setErrorMsg('Please enter the full 6-digit OTP');
             return;
         }
-        alert("Verifying:", identifier, otpValue);
+        // alert("Verifying:", identifier, otpValue);
 
         setLoading(true);
         setErrorMsg('');
@@ -38,6 +41,7 @@ const OTPForm = ({ API_URL, identifier }) => {
 
             alert('OTP verified successfully!');
             // Redirect or show login here
+            navigate("/")
         } catch (err) {
             const msg = err.response?.data?.message || 'Failed to verify OTP';
             setErrorMsg(msg);

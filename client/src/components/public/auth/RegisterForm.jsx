@@ -93,6 +93,8 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm
             const res = await axios.post(`${API_URL}/api/public/register`, {
                 name, email, username, password
             });
+            const token = res.data.token;
+            localStorage.setItem('token', token);
 
             alert('Registered successfully!');
             setName('');

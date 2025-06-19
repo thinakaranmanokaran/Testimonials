@@ -101,8 +101,10 @@ exports.tempRegisterUser = async (req, res) => {
         // ✅ Send plain OTP (not hashed) to user's email
         await sendOtpEmail(email, otp);  // just use the original otp here
 
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         // Save to TempUser
-        await TempUser.create({ name, email, username, password, role });
+        await TempUser.create({ name, email, username, password: hashedPassword, role });
 
         res.status(201).json({ message: "Registered temporarily. Please verify OTP.", userData: { name, email, username } });
     } catch (err) {

@@ -43,11 +43,11 @@ const signinSchema = new mongoose.Schema({
 });
 
 // Hash the password before saving for `userSchema`
-Register.pre("save", async function (next) {
-    if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
-});
+// Register.pre("save", async function (next) {
+//     if (!this.isModified('password')) return next();
+//     this.password = await bcrypt.hash(this.password, 10);
+//     next();
+// });
 
 // Hash the password before saving for `userAddSchema`
 signinSchema.pre("save", async function (next) {
