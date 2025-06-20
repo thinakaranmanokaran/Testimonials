@@ -25,7 +25,9 @@ const Register = () => {
         return 'initial';
     }); // 'initial' | 'verify' | 'register' | 'signin'
     const [verifiedUsername, setVerifiedUsername] = useState('');
+    const [verifiedEmail, setVerifiedEmail] = useState('');
     const [identifier, setIdentifier] = useState('');
+    const [email, setEmail] = useState('');
     const API_URL = import.meta.env.VITE_URL;
 
     useEffect(() => {
@@ -92,8 +94,8 @@ const Register = () => {
                     >
                         <ValidationForm
                             API_URL={API_URL}
-                            setVerifiedUsername={setVerifiedUsername}
-                            setIdentifier={setIdentifier}
+                            setVerifiedUsername={setVerifiedUsername} setVerifiedEmail={setVerifiedEmail}
+                            setIdentifier={setIdentifier} setEmail={setEmail}
                             handleOpenSignin={() => setCurrentView('signin')}
                             setGoToRegister={() => setCurrentView('register')}
                         />
@@ -109,8 +111,8 @@ const Register = () => {
                         variants={variants}
                     >
                         <RegisterForm
-                            API_URL={API_URL}
-                            identifier={identifier}
+                            API_URL={API_URL} givenEmail={email} setGivenEmail={setEmail}
+                            identifier={identifier} 
                             setIdentifier={setIdentifier} handleOpenSignin={() => setCurrentView('signin')}
                             handleOpenOTPForm={() => setCurrentView('otpform')}
                         />
@@ -125,7 +127,7 @@ const Register = () => {
                         exit="exit" className='w-full  flex justify-center items-center'
                         variants={variants}
                     >
-                        <OTPForm identifier={identifier} API_URL={API_URL} />
+                        <OTPForm email={email} API_URL={API_URL} />
                     </motion.div>
                 )}
 

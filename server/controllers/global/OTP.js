@@ -22,6 +22,7 @@ exports.sendOtpToEmail = async (req, res) => {
 
         await sendOtpEmail(email, otp);
 
+        console.log(`OTP sent to ${email}`);
         res.status(200).json({ message: 'OTP sent to email' });
     } catch (error) {
         console.error('Error sending OTP:', error);

@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { InputBox, Button } from '../../../components';
 import axios from 'axios';
 
-const ValidationForm = ({ API_URL, setVerifiedUsername, setIdentifier, handleOpenSignin, setGoToRegister }) => {
+const ValidationForm = ({ API_URL, setVerifiedUsername, setIdentifier, setEmail, setVerifiedEmail, handleOpenSignin, setGoToRegister }) => {
     const [identifier, setLocalIdentifier] = useState('');
+    const [localemail, setLocalEmail] = useState('');
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
@@ -55,22 +56,40 @@ const ValidationForm = ({ API_URL, setVerifiedUsername, setIdentifier, handleOpe
 
             if (res.data.exists) {
                 setResult({ found: true, user: res.data.user });
-                setVerifiedUsername(res.data.user.username || input);
+                const user = res.data.user;
+                setVerifiedUsername(user.username || input);
+                setIdentifier(user.username || input);
+                setEmail(user.email || input);                
+                setVerifiedEmail(user.email || input);                
                 handleOpenSignin();
-            } else {
-                setResult({ found: false });
-                setErrorMsg('No account found with this username or email.');
-                setIdentifier(input);
-                setGoToRegister(true);
-            }
+            }// } else {
+            //     setResult({ found: false });
+            //     const { type } = error.response?.data || {};
+            //     setErrorMsg(`No account found with this ${type === 'email' ? "email" : "username"}.`);
+            //     alert("catch")
+            //     if (type === 'email') {
+            //         setEmail(input);
+            //     } else {
+            //         setIdentifier(input);
+            //     }
+
+            //     setGoToRegister(true);
+            // }
         } catch (error) {
+            const { type, message } = error.response?.data || {};
+
             if (error.response?.status === 404) {
                 setResult({ found: false });
-                setErrorMsg('No account found with this username or email.');
-                setIdentifier(input);
+                setErrorMsg(`No account found with this ${type === 'email' ? "email" : "username"}.`);
+                if (type === 'email' || isEmail(input)) {
+                    setEmail(input);
+                } else {
+                    setIdentifier(input);
+                }                
+                setGoToRegister(true);
             } else {
                 console.error('Error identifying user:', error);
-                setErrorMsg(error.response?.data?.message || 'Server error');
+                setErrorMsg(message || 'Server error');
             }
         } finally {
             setLoading(false);
@@ -89,6 +108,7 @@ const ValidationForm = ({ API_URL, setVerifiedUsername, setIdentifier, handleOpe
                 setValue={(val) => {
                     setValue(val);
                     setLocalIdentifier(val);
+                    setLocalEmail(val);
                 }}
             />
 

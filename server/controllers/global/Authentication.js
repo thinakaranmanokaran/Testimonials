@@ -92,11 +92,17 @@ exports.tempRegisterUser = async (req, res) => {
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
         // Save hashed OTP in DB
-        await OTP.findOneAndUpdate(
+        const updatedOtp = await OTP.findOneAndUpdate(
             { email },
             { otp: hashedOtp, expiresAt },
             { upsert: true, new: true }
         );
+        if (!updatedOtp) {
+            console.error("OTP not stored for", email);
+        } else {
+            console.log("OTP stored for", email);
+        }
+        
 
         // ✅ Send plain OTP (not hashed) to user's email
         await sendOtpEmail(email, otp);  // just use the original otp here
@@ -197,23 +203,34 @@ exports.getUserNameByEmail = async (req, res) => {
         res.status(200).json({ name: user.name });
     } catch (error) {
         console.error('Error in getUserNameByEmail:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(404).json({ message: 'Server error', error: error.message });
     }
 };
 
 
 exports.checkUserExistence = async (req, res) => {
     try {
-        const { identifier } = req.body; // identifier can be email or username
+        const { identifier } = req.body;
 
-        // Find by email OR username
+        console.log('Incoming request - Identifier:', identifier);
+
+        if (!identifier || identifier.trim() === '') {
+            console.log('Validation failed: Identifier is empty');
+            return res.status(400).json({ message: 'Identifier is required' });
+        }
+
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+        console.log('Identifier type detected:', isEmail ? 'email' : 'username');
+
         const user = await Register.findOne({
             $or: [{ email: identifier }, { username: identifier }]
         });
 
         if (user) {
+            console.log(`User found by ${isEmail ? 'email' : 'username'}:`, user.username);
             return res.status(200).json({
                 exists: true,
+                type: isEmail ? 'email' : 'username',
                 user: {
                     id: user._id,
                     name: user.name,
@@ -223,7 +240,12 @@ exports.checkUserExistence = async (req, res) => {
                 }
             });
         } else {
-            return res.status(404).json({ exists: false, message: "User not found" });
+            console.log(`User not found by ${isEmail ? 'email' : 'username'}:`, identifier);
+            return res.status(404).json({
+                exists: false,
+                type: isEmail ? 'email' : 'username',
+                message: "User not found"
+            });
         }
     } catch (error) {
         console.error('Error in checkUserExistence:', error);

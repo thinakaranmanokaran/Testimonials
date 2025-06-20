@@ -3,10 +3,10 @@ import { InputBox, Button } from '../../../components';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm, setIdentifier }) => {
+const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm, setIdentifier, givenEmail, setGivenEmail  }) => {
     const [name, setName] = useState('');
-    const [email, setEmail] = useState(identifier);
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState(givenEmail || '');
+    const [username, setUsername] = useState(identifier || '');     
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState({
@@ -103,7 +103,7 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm
             setPassword('');
 
             // After successful registration
-            // await axios.post(`${API_URL}/api/public/send-otp`, { email });
+            await axios.post(`${API_URL}/api/public/send-otp`, { email });
             setIdentifier(email);  // ✅ This updates the parent with email for OTPForm
             handleOpenOTPForm();  // ✅ Now OTPForm will receive correct identifier
 
