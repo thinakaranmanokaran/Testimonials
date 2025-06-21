@@ -8,6 +8,7 @@ const Register = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     phoneNo: { type: String, required: false },
     password: { type: String, required: true, select: false },
+    photo: { type: String, required: false },
     role: {
         type: String,
         enum: ["admin", "employee", "user"],
