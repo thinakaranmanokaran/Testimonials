@@ -28,6 +28,8 @@ const Register = () => {
     const [verifiedEmail, setVerifiedEmail] = useState('');
     const [identifier, setIdentifier] = useState('');
     const [email, setEmail] = useState('');
+    const [user, setUser] = useState(null);
+
     const API_URL = import.meta.env.VITE_URL;
 
     useEffect(() => {
@@ -44,42 +46,65 @@ const Register = () => {
         exit: { opacity: 0, y: 30, transition: { duration: 0.3 } }
     };
 
+    useEffect(() => {
+        axios
+            .get(`${API_URL}/api/public/register`, { withCredentials: true })
+            .then((res) => setUser(res.data))
+            .catch((err) => console.log(err));
+    }, []);
 
-    const InitialOptions = () => (
-        <div className='w-full flex justify-center items-center flex-col font-para_inter'>
-            <div className='flex flex-col items-center w-full max-w-80 space-y-4'>
-                <h4 className='text-base text-center mb-5'>Please choose your Registration method.</h4>
 
-                <button className='flex items-center justify-center p-1 pr-3 rounded-full border-textgrey border-[1px] w-full cursor-pointer'>
-                    <img src={images.GoogleLogo} className='w-10 h-10' alt='Google Logo' />
-                    <span>Register using Google</span>
-                </button>
+    const InitialOptions = () => {
 
-                <div className='w-full flex justify-center items-center space-x-2'>
-                    <div className='bg-textgrey w-full h-[1px] mt-1 opacity-30'></div>
-                    <div className='text-textgrey opacity-60 text-sm'>or</div>
-                    <div className='bg-textgrey w-full h-[1px] mt-1 opacity-30'></div>
-                </div>
+        const handleGoogleLogin = () => {
+            const width = 500;
+            const height = 600;
+            const left = window.screen.width / 2 - width / 2;
+            const top = window.screen.height / 2 - height / 2;
+        
+            window.open(
+                `${API_URL}/api/auth/google`,
+                '_blank',
+                `width=${width},height=${height},left=${left},top=${top}`
+            );
+        };        
 
-                <button
-                    className='flex items-center justify-center p-1 pr-3 rounded-full bg-bgyellow border-textgrey border-[1px] w-full space-x-2 cursor-pointer'
-                    onClick={() => setCurrentView('verify')}
-                >
-                    <img src={images.Logo} className='w-6 h-10' alt='Rumoro Logo' />
-                    <span>
-                        Create an Account in <span className='font-semibold'>Rumoro</span>
-                    </span>
-                </button>
+        return (
+            <div className='w-full flex justify-center items-center flex-col font-para_inter'>
+                <div className='flex flex-col items-center w-full max-w-80 space-y-4'>
+                    <h4 className='text-base text-center mb-5'>Please choose your Registration method.</h4>
 
-                <div className='space-x-1 text-sm'>
-                    <span className='text-textgrey opacity-75'>Already have an Account?</span>
-                    <span className='underline cursor-pointer' onClick={() => setCurrentView('signin')}>
-                        SignIn
-                    </span>
+                    <button className='flex items-center justify-center p-1 pr-3 rounded-full border-textgrey border-[1px] w-full cursor-pointer' onClick={handleGoogleLogin}>
+                        <img src={images.GoogleLogo} className='w-10 h-10' alt='Google Logo' />
+                        <span>Register using Google</span>
+                    </button>
+
+                    <div className='w-full flex justify-center items-center space-x-2'>
+                        <div className='bg-textgrey w-full h-[1px] mt-1 opacity-30'></div>
+                        <div className='text-textgrey opacity-60 text-sm'>or</div>
+                        <div className='bg-textgrey w-full h-[1px] mt-1 opacity-30'></div>
+                    </div>
+
+                    <button
+                        className='flex items-center justify-center p-1 pr-3 rounded-full bg-bgyellow border-textgrey border-[1px] w-full space-x-2 cursor-pointer'
+                        onClick={() => setCurrentView('verify')}
+                    >
+                        <img src={images.Logo} className='w-6 h-10' alt='Rumoro Logo' />
+                        <span>
+                            Create an Account in <span className='font-semibold'>Rumoro</span>
+                        </span>
+                    </button>
+
+                    <div className='space-x-1 text-sm'>
+                        <span className='text-textgrey opacity-75'>Already have an Account?</span>
+                        <span className='underline cursor-pointer' onClick={() => setCurrentView('signin')}>
+                            SignIn
+                        </span>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
 
     const renderContent = () => {
         return (
@@ -112,7 +137,7 @@ const Register = () => {
                     >
                         <RegisterForm
                             API_URL={API_URL} givenEmail={email} setGivenEmail={setEmail}
-                            identifier={identifier} 
+                            identifier={identifier}
                             setIdentifier={setIdentifier} handleOpenSignin={() => setCurrentView('signin')}
                             handleOpenOTPForm={() => setCurrentView('otpform')}
                         />
