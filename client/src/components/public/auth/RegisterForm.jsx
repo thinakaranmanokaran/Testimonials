@@ -104,7 +104,7 @@ const RegisterForm = ({ identifier, API_URL, handleOpenSignin, handleOpenOTPForm
 
             // After successful registration
             await axios.post(`${API_URL}/api/public/send-otp`, { email });
-            setIdentifier(email);  // ✅ This updates the parent with email for OTPForm
+            setGivenEmail(email);  // ✅ This updates the parent with email for OTPForm
             handleOpenOTPForm();  // ✅ Now OTPForm will receive correct identifier
 
 

@@ -21,6 +21,11 @@
 }
 
 @font-face {
+  font-family: "MidInter";
+  src: url(./assets/fonts/paragrabh/inter/Inter_18pt-Medium.ttf)  format("truetype");
+}
+
+@font-face {
   font-family: "ParaUrban";
   src: url(./assets/fonts/paragrabh/urban/Urbanist-Regular.ttf)  format("truetype");
 }
@@ -44,6 +49,7 @@
   --font-title: "Title", sans-serif;
   --font-title_inter: "TitleInter", sans-serif;
   --font-para_inter: "ParaInter", sans-serif;
+  --font-mid_inter: "MidInter", sans-serif;
   --font-para_urban: "ParaUrban", sans-serif;
   --font-code: "Code", sans-serif;
 }

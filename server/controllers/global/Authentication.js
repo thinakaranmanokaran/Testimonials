@@ -89,7 +89,7 @@ exports.tempRegisterUser = async (req, res) => {
         const hashedOtp = await bcrypt.hash(otp, 10);
 
         // Set expiry to 10 minutes
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
         // Save hashed OTP in DB
         const updatedOtp = await OTP.findOneAndUpdate(

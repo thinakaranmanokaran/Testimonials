@@ -48,7 +48,7 @@ const OTPInput = ({ length = 6, onChangeOTP }) => {
     };
 
     return (
-        <div className="flex gap-2 justify-center">
+        <div className="flex gap-3 justify-center">
             {otp.map((digit, index) => (
                 <input
                     key={index}
@@ -60,7 +60,7 @@ const OTPInput = ({ length = 6, onChangeOTP }) => {
                     onChange={(e) => handleChange(e.target, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     onPaste={handlePaste}
-                    className="w-12 h-12 text-center text-xl border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-bgdark transition"
+                    className={`w-12 h-12 text-center text-[22px]  rounded-md focus:outline-none transition ${digit ? 'ring-2 ring-bgdark' : 'border-2 border-gray-300'}`}
                 />
             ))}
         </div>

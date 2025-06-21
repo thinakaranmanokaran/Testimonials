@@ -35,14 +35,15 @@ exports.verifyOtp = async (req, res) => {
     const { email, otp } = req.body;
 
     try {
-        const otpRecord = await OTP.findOne({ email });
+        const otpRecord = await OTP.findOne({ email }).select('+otp');
 
         if (!otpRecord) {
-            return res.status(400).json({ message: 'OTP not found' });
+            return res.status(404).json({ message: 'OTP not found' });
         }
 
-        if (otpRecord.otp !== otp) {
-            return res.status(400).json({ message: 'Invalid OTP' });
+        const isOTPValid = await bcrypt.compare(otp, otpRecord.otp);
+        if (!isOTPValid) {
+            return res.status(401).json({ message: 'Invalid OTP' });
         }
 
         if (otpRecord.expiresAt < new Date()) {
